@@ -8,8 +8,8 @@ Navegando na web eu pude entrontrar vários entusiastas de automação comentand
 Pensando nisso e partindo de uma necessidade pessoal, pois estou explorando a utilização do Hermes Agent, descidi documentar algumas aplicações de uso do Hermes Agent em projetos reais conforme eu vou estudando, tanto para minha consulta futura como para compartirlhar com outros que querenter uma documentação pratica com caso de uso.
 Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto de vista o que é o **Hermes Agent** e para que serve.
 > Documentação Oficial:
-    Para uma consulta mais apurada dos comandos, recomendo consultar a documentação oficial do Hermes Agent em ==[Docs](https://hermes-agent.nousresearch.com/docs)==
-    Pagina oficial do projeto no ==[GitHub](https://github.com/NousResearch/hermes-agent)==
+    - Para uma consulta mais apurada dos comandos, recomendo consultar a documentação oficial do Hermes Agent em [Docs](https://hermes-agent.nousresearch.com/docs)
+    - Pagina oficial do projeto no [GitHub](https://github.com/NousResearch/hermes-agent)
 
 ## Entendendo o Hermes Agent
 

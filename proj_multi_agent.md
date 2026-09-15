@@ -52,7 +52,7 @@ Agora podemos ver que o bot retornou o nosso nome de usuário **@username** e lo
     - Monte algo como:
         ![planilha](./img/planilha1.png)
 
-### 2. Ciando os bots no Telegram
+### 2. Ciando os Bots no Telegram
 
 Temos que criar um **Bot** para cada **Agente** utilizando o `@BotFather` do Telegram.
 Cada agente é um setor ou seja um departamento dentro de uma empresa
@@ -67,27 +67,49 @@ Cada agente é um setor ou seja um departamento dentro de uma empresa
 Em seguida dê um **username** (Obs: o username do bot **deve** ser terminado com **_bot**) , ao clicar em criar, será gerado um token especifico para este bot. É com este token que usaremos para efetuar um Resquest via API HTTP
     ![bf3](./img/botfather3.png)
   
-Ao termino da criação de todos os agentes teremos uma planilha com os Tokens e o ID do Orquestrador (neste caso você que demos o nome de Agente CTO)
+Ao termino da criação de todos os agentes teremos uma planilha com os Tokens e o ID do Orquestrador (neste caso você com o nome de Agente CTO)
     ![planilha2](./img/planilha.png)
 
 Se selecionarmos a aba **Apps** no Telegram e depois clicar em **BotFather**, podemos ver que temos a seguinte estrutura de Bots
     ![bf4](./img/botfather4.png)
 
-### 3. Criando profiles Hermes
+### 3. Criando Profiles Hermes
 
 Temos que criar os profiles de cada bot (agente) dentro do Hermes com seu respectivo Token junto com o ID do orquestrador, e para isso vamos rodar alguns comandos no terminal para completar este profiles.
-    1. Abra um terminal de sua preferencia, como o **Powershell** ou **Bash**
-    2. Execute o seguinte comando no terminal: `hermes --TUI`
 
-```ts
+1. Abra um terminal de sua preferencia, como o **Powershell** ou **Bash**
+2. Execute o seguinte comando no terminal: `hermes --TUI`
+
+```bash
 NOME=time-perfomance
 TOKEN=gerado no item 2 quando criado o bot
 MEU_ID=gerado no item 1 ao rodar o @userinfobot
 
 hermes profile create "$NOME" --clone-from default 2>/dev/null || echo "→ profile já existia, seguindo"
-printf 'TELEGRAM_ALLOWED_USERS=%s\nTELEGRAM_HOME_CHANNEL=%s\nTELEGRAM_BOT_TOKEN=%s\n' "$MEU_ID" "$MEU_ID" "$TOKEN" > ~/profiles/"$NOME"/.env
+printf 'TELEGRAM_ALLOWED_USERS=%s\nTELEGRAM_HOME_CHANNEL=%s\nTELEGRAM_BOT_TOKEN=%s\n' "$MEU_ID" "$MEU_ID" "$TOKEN" >> ~/profiles/"$NOME"/.env
 setsid hermes -p "$NOME" gateway run --replace > "/tmp/$NOME.log" 2>&1 &
 sleep 8 && hermes gateway status && tail -5 "/tmp/$NOME.log"
 ```
 
-Ordem importa: o .env é gravado antes do gateway subir; se inverter, dois profiles disputam o mesmo token e o bot fica mudo. Cole um bloco de cada vez e espere os 8 segundos do sleep. “Errno 98” na porta 8643 é normal: o primeiro gateway pega a porta de métricas, os outros reclamam e seguem. A reativação é uma linha por profile de propósito, o lshell do Hermes recusa for/done. Se algum profile não subir, o log está em /tmp/<nome>-gateway.log.
+3. Reativando o gateway com os novos profiles
+
+```bash
+setsid hermes -p default gateway run --replace > /tmp/default-gateway.log 2>&1 &
+setsid hermes -p time-perfomance gateway run --replace > /tmp/time-perfomance-gateway.log 2>&1 &
+setsid hermes -p time-pedagogico gateway run --replace > /tmp/time-pedagogico-gateway.log 2>&1 &
+setsid hermes -p time-cs gateway run --replace > /tmp/time-cs-gateway.log 2>&1 &
+setsid hermes -p time-comercial gateway run --replace > /tmp/time-comercial-gateway.log 2>&1 &
+setsid hermes -p time-conteudo gateway run --replace > /tmp/time-conteudo-gateway.log 2>&1 &
+sleep 8
+hermes gateway list
+```
+
+> Obs.: Para entendendo o que cada linha do bloco de comando faz, leia o arquivo [comando_block.md](command_block.md)
+
+**Ordem importa**:
+    - o .env é gravado antes do gateway subir;
+    - se inverter, dois profiles disputam o mesmo token e o bot fica mudo.
+    - Cole um bloco de cada vez e espere os 8 segundos do sleep.
+    - “Errno 98” na porta 8643 é normal: o primeiro gateway pega a porta de métricas, os outros reclamam e seguem.
+    - A reativação é uma linha por profile de propósito, o shell do Hermes recusa for/done.
+    - Se algum profile não subir, consulte o log localizado no diretório do Hermes que está em **`/tmp/<nome>-gateway.log`**
