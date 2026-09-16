@@ -65,13 +65,13 @@ Temos que identificar o ID do nosso Telegram, pois será a partir deste ID que n
 > **Obs.:**
 > Caso tenha mais alguém que também vai interagir com os bots através do Telegram, então será necessário que este usuário recupere o número do ID dele para ser cadastrado.
 
-Na barra de pesquisa do Telegram, busque por **`User Info`** e clique em @userinfobot. Será aberto uma janela de chat.
+Na barra de pesquisa do Telegram, busque por **`User Info`** e clique em ==@userinfobot==, será aberto uma janela de chat.
 ![id](./img/userinfo.png)
   
 Neste chat, digite `/start`
 ![id2](./img/userinfo2.png)
 Agora podemos ver que o bot retornou o nosso nome de usuário **@username** e logo abaixo temos o **id:XXXXXXXXX**
-    - Antes de proceguir vamos preencher uma tabela com os dados gerados, vamos precisar deles mais a frente para rodar os comando de cadastro dentro do Hermes.
+    - Antes de proceguir vamos preencher uma tabela com os dados gerados, vamos precisar deles mais a frente para rodar o script de cadastro dos profiles dentro do Hermes.
     - Abra a planilha [dados_profiles.xlsx](dados_profiles.xlsx):
         ![planilha](./img/planilha.png)
 
@@ -103,11 +103,9 @@ Temos que criar os profiles de cada agente dentro do Hermes com seu respectivo T
 
 > Obs.: Para entendendo o que cada linha do script faz, leia os seguintes arquivos:
     [create-hermes-profile.md](./scripts/create-hermes-profile.md)
-    [reset_gateway.md](./scripts/reset_gateway.md)
     ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
 
-* Para sistemas operacionais Windows utilize o arquivo [create-hermes-profile_win.sh](./scripts/create-hermes-profile_win.sh).
-* Para sistemas operacionais Linux utilize o arquivo [create-hermes-profile_linux.sh](./scripts/create-hermes-profile_linux.sh).
+* Para sistemas operacionais Windows utilize o arquivo [create-hermes-profile.sh](./scripts/create-hermes-profile.sh).
 
 Os comando podem ser diferentes conforme o sistema operacional. Como neste caso eu estou rodando em uma máquina local e a maioria das pessoas utiliza Windows, vou dar o exemplo utilizando comando para o OS Windows, mas a lógica continua a mesma para qualque OS.
 
@@ -166,7 +164,7 @@ Exemplo:
 
 #### 2. Ativando os Gateways dos Profiles
 
-Observe que no último comando (`hermes profile list`) executado podenos notar que a coluna **Gateway** mostra somente um processo em **running** que é do profile default (global)
+O script de cadastro dos profiles já ativa o gateway para todos, mas caso seja necessário reiniciar podemos ou algum em especifico, primeiramente executar o comando (`hermes profile list`) e verificar qual profile esta com gateway na condição **stopping**;
 
 ```text
               Hermes Gateway
@@ -174,14 +172,29 @@ Observe que no último comando (`hermes profile list`) executado podenos notar q
                     │
           ┌─────────┴─────────┐
           │                   │
-       default          time-performance
+       default             profile
        running             stopped
 ```
 
-Precisamos que todos os profiles estejam em running, portanto vamos rodar outro script:
+Abra o terminal e execute o comando para o profile especifico:
 
-* Para sistemas operacionais Windows utilize o arquivo [reset_gateway_win.sh](./scripts/reset_gateway_win.sh).
-* Para sistemas operacionais Linux utilize o arquivo [reset_gateway_linux.sh](./scripts/reset_gateway_linux.sh).
+⟹ Para sistemas operacionais Windows utilize:
+
+```bash
+hermes -p default gateway run --replace > /tmp/default-gateway.log 2>&1 &
+hermes -p time-perfomance gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
+sleep 8
+hermes gateway list
+```
+
+⟹ Para sistemas operacionais Linux utilize:
+
+```bash
+setsid hermes -p default gateway run --replace > /tmp/default-gateway.log 2>&1 &
+setsid hermes -p time-perfomance gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
+sleep 8
+hermes gateway list
+```
 
 **Ordem importa**:
     - o .env é gravado antes do gateway subir;

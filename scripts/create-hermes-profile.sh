@@ -11,9 +11,9 @@ set -u
 # 1. CONFIGURAÇÃO DO NOVO PROFILE
 # ============================================================
 
-NOME="time-performance"
-MEU_ID="758543036"
-TOKEN="88...."
+NOME="<YOUR_PROFILE_NAME>"  # Exemplo: "meu-profile"
+MEU_ID="<TELEGRAM_ALLOWED_USERS>"
+TOKEN="<YOUR_TELEGRAM_BOT_TOKEN>"
 
 
 # ============================================================
@@ -53,26 +53,13 @@ echo "============================================================"
 echo
 
 echo "Profile: $NOME"
-echo "Telegram ID: $MEU_ID"
 echo
 
 [[ -n "$NOME" ]] || erro "NOME não foi definido."
 [[ -n "$MEU_ID" ]] || erro "MEU_ID não foi definido."
-[[ -n "$TOKEN" ]] || erro "TOKEN do Telegram não foi definido."
+[[ -n "$TOKEN" ]] || erro "TOKEN não foi definido."
 
 ok "Variáveis básicas encontradas."
-
-
-# ============================================================
-# 5. VALIDAR INSTALAÇÃO DO HERMES
-# ============================================================
-
-if ! command -v hermes >/dev/null 2>&1; then
-    erro "Comando 'hermes' não encontrado no PATH."
-fi
-
-ok "Hermes encontrado."
-
 
 # ============================================================
 # 6. VALIDAR .ENV GLOBAL
@@ -121,10 +108,12 @@ if [[ -d "$PROFILE_DIR" ]]; then
     echo "o script será encerrado."
 
     echo
-    echo "Se deseja recriá-lo, execute:"
+    echo "Se deseja recriá-lo é necessário apagalo antes, execute o comando:"
     echo
     echo "    hermes profile delete $NOME"
     echo
+    echo "Ou altere o nome do profile na variável NOME no início do script."
+    echo "Em seguida, execute novamente este script."
 
     exit 1
 fi
@@ -135,7 +124,7 @@ fi
 # ============================================================
 
 echo
-echo "→ Criando profile '$NOME'..."
+echo "→ Criando profile: '$NOME'..."
 
 if ! hermes profile create "$NOME" --clone-from default; then
     erro "Falha ao criar o profile."
