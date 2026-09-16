@@ -194,7 +194,7 @@ Primeiramente executar o comando (`hermes profile list`) para verificar que some
        running             stopped
 ```
 
-!!! Atenção: Se você estiver em um servidor e o mesmo foi reiniciado, este procedimento de reativação dos gateway dos profiles será necessário também.
+[!NOTE] Se você estiver em um servidor e o mesmo foi reiniciado, este procedimento de reativação dos gateway dos profiles será necessário também.
 
 Abra o terminal e execute o comando para cada profile ou execute o script:
 
