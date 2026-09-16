@@ -121,7 +121,7 @@ Temos que criar os profiles de cada agente dentro do Hermes com seu respectivo T
 
 Os comando podem ser diferentes conforme o sistema operacional. Como neste caso eu estou rodando em uma máquina local e a maioria das pessoas utiliza Windows, vou dar o exemplo utilizando comando para o OS Windows, mas a lógica continua a mesma para qualque OS.
 
-#### 1. Verificando o status dos profiles no Hermes
+### Step 2. Verificando o status dos profiles no Hermes
 
 1. Abra o terminal **Git Bash** ou o terminal CLI local do seu VPS na seção do Hermes (para acessa-lo é necessário ter o [Git instalado](https://git-scm.com/install/windows))
 2. Execute o seguinte comando no terminal: `hermes profile list`
@@ -179,9 +179,10 @@ Exemplo:
 
 11. Para ambiente windows localmente não podemos fechar o terminal, caso contrario os processos dos gateways dos profiles serão encerrados. Já para ambiente VPS isso não oscorre pois o sistema fica rodando 24/7 e só será necessário reiniciar caso seja realmente necessário.
 
-#### 2. Reativando os Gateways dos Profiles
+### Step 3. Reativando os Gateways dos Profiles
 
-Sempre que você estiver rodando localmente e em ambiente Windows será necessário a reativação dos gateways para os profiles de forma manual. Primeiramente executar o comando (`hermes profile list`) e verificar que somente o profile default esta com status "running" os outros profile estão com gateway na condição **stopping**;
+Sempre que você estiver rodando localmente em ambiente Windows/linux será necessário a reativação dos gateways para os profiles de forma manual.
+Primeiramente executar o comando (`hermes profile list`) para verificar que somente o profile default esta com status "running" os outros profile estão com gateway na condição **stopped**.
 
 ```text
               Hermes Gateway
@@ -192,6 +193,8 @@ Sempre que você estiver rodando localmente e em ambiente Windows será necessá
        default             profiles
        running             stopped
 ```
+
+!!! Atenção: Se você estiver em um servidor e o mesmo foi reiniciado, este procedimento de reativação dos gateway dos profiles será necessário também.
 
 Abra o terminal e execute o comando para cada profile ou execute o script:
 
@@ -219,7 +222,6 @@ Abra o terminal e execute o comando para cada profile ou execute o script:
 
     Executando por escript -> [wakeup-gateway_lin.sh](./scripts/wakeup-gateway_lin.sh)
 
-
 **Ordem importa**:
     - o .env é gravado antes do gateway subir;
     - se inverter, dois profiles disputam o mesmo token e o bot fica mudo.
@@ -230,4 +232,10 @@ Abra o terminal e execute o comando para cada profile ou execute o script:
 
 Agora vamos confirmar a criação dos perfil utilizando o comando `hermes profile list`
 
-### Step 2. 
+## 3. Ativar todos os bots
+
+Com os profiles com status **running**, agora vamos acordar os bots no Telegram, cada um precisa receber o primeiro /start pra começar a responder pelo agente.
+
+1. Abra o seu Telegram e busque pela aba **Apps** e clique em **BotFather**
+2. Selecione um bot de cada vez e de o comando `/start`
+
