@@ -66,34 +66,45 @@ Temos que identificar o ID do nosso Telegram, pois será a partir deste ID que n
 > Caso tenha mais alguém que também vai interagir com os bots através do Telegram, então será necessário que este usuário recupere o número do ID dele para ser cadastrado.
 
 Na barra de pesquisa do Telegram, busque por **`User Info`** e clique em ==@userinfobot==, será aberto uma janela de chat.
+
 ![id](./img/userinfo.png)
   
 Neste chat, digite `/start`
+
 ![id2](./img/userinfo2.png)
+
 Agora podemos ver que o bot retornou o nosso nome de usuário **@username** e logo abaixo temos o **id:XXXXXXXXX**
-    - Antes de proceguir vamos preencher uma tabela com os dados gerados, vamos precisar deles mais a frente para rodar o script de cadastro dos profiles dentro do Hermes.
-    - Abra a planilha [dados_profiles.xlsx](dados_profiles.xlsx):
-        ![planilha](./img/planilha.png)
+
+* Antes de proceguir vamos preencher uma tabela com os dados gerados, vamos precisar deles mais a frente para rodar o script de cadastro dos profiles dentro do Hermes.
+
+* Abra a planilha [dados_profiles.xlsx](dados_profiles.xlsx):
+
+    ![planilha](./img/planilha.png)
 
 ### Step 2. Ciando os Bots no Telegram
 
 Temos que criar um **Bot** para cada **Agente** utilizando o `@BotFather` do Telegram.
 Cada agente é um setor ou seja um departamento dentro de uma empresa
 
-1. Abra o telegram e pesquise por BotFather na aba **Apps**;
+1. Abra o telegram e pesquise por BotFather na aba **Apps**.
+
     ![bf1](./img/botfather.png)  
   
-2. Clique em `Create a New Bot`;  
+2. Clique em `Create a New Bot`.
+
     ![bf2](./img/botfather2.png)
   
 3. Dê um nome usando a referncia criada na planilha para o seu bot no campo **Bot name**, caso queira fazer uma descrição deste bot utilize a proxima linha. Em seguida dê um **username** (Obs: o username do bot **"deve"** terminar com ==**_bot**==) , ao clicar em criar, será gerado um token especifico para este bot. É com este token que usaremos para efetuar um Resquest via API HTTP
+
     ![bf3](./img/botfather3.png)
   
-Ao termino da criação de todos os agentes teremos uma planilha com os Tokens e o ID do Orquestrador (neste caso você com o nome de Agente CTO)
-    ![planilha2](./img/planilha1.png)
+Ao termino da criação de todos os agentes teremos uma planilha com os Tokens e o ID do Orquestrador (neste caso você com o nome de Agente CEO)
+
+![planilha2](./img/planilha1.png)
 
 Se selecionarmos a aba **Apps** no Telegram e depois clicar em **BotFather**, podemos ver que temos a seguinte estrutura de Bots
-    ![bf4](./img/botfather4.png)
+
+![bf4](./img/botfather4.png)
 
 ## 2. Configuração dos Profiles no Hermes
 
@@ -102,10 +113,11 @@ Se selecionarmos a aba **Apps** no Telegram e depois clicar em **BotFather**, po
 Temos que criar os profiles de cada agente dentro do Hermes com seu respectivo Token junto com o ID do orquestrador, e para isso vamos rodar um script no terminal para completar esta configuração.
 
 > Obs.: Para entendendo o que cada linha do script faz, leia os seguintes arquivos:
-    [create-hermes-profile.md](./scripts/create-hermes-profile.md)
+    [create-profile_win.md](./scripts/create-profile_win.md)
     ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
 
-* Para sistemas operacionais Windows utilize o arquivo [create-hermes-profile.sh](./scripts/create-hermes-profile.sh).
+* Para sistemas operacionais Windows utilize o arquivo [create-profile_win.sh](./scripts/create-profile_win.sh)
+* Para sistemas operacionais Linux utilize o arquivo [create-profile_lin.sh](./scripts/create-profile_lin.sh)
 
 Os comando podem ser diferentes conforme o sistema operacional. Como neste caso eu estou rodando em uma máquina local e a maioria das pessoas utiliza Windows, vou dar o exemplo utilizando comando para o OS Windows, mas a lógica continua a mesma para qualque OS.
 
@@ -114,7 +126,9 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
 1. Abra o terminal **Git Bash** ou o terminal CLI local do seu VPS na seção do Hermes (para acessa-lo é necessário ter o [Git instalado](https://git-scm.com/install/windows))
 2. Execute o seguinte comando no terminal: `hermes profile list`
     Podemos verificar que temos inicialmente somente o profile padrão que é chamado de **default**
+
     ![status1](./img/status_profile1.png)
+
     Nosso objetivo é no final da configuração dos profiles termos uma estrutura:
 
     ```text
@@ -142,7 +156,7 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
           running          running                     running
     ```
 
-3. Agora abra o arquivo [create-hermes-profile_win.sh](./scripts/create-hermes-profile_win.sh) em um editor de coódigo como o Visual Studio Code ou outro editor de código, e coloque **NOME**, **MEU_ID**, **TOKEN** que se encontra no início do script (use a planilha [daddos_profile.xlsx](dados_profiles.xlsx) para auxiliar).
+3. Agora abra o arquivo [create-profile_win.sh](./scripts/create-profile_win.sh) em um editor de coódigo como o Visual Studio Code ou outro editor de código, e coloque **NOME**, **MEU_ID**, **TOKEN** que se encontra no início do script (use a planilha [daddos_profile.xlsx](dados_profiles.xlsx) para auxiliar).
 Exemplo:
 
     ```bash
@@ -154,17 +168,20 @@ Exemplo:
 4. Salve o arquivo e depois retorne ao terminal Bash;
 5. Navegue pelo terminal até a pasta onde se encontra os arquivos;
 6. Execute o script com o seguinte comando:  
-    `bash create-hermes-profile_win.sh`
+    `bash create-profile_win.sh`
 7. Aguarde o processor finalizar acompanhando os outputs no terminal;
 8. Depois, abra novamente o arquivo e altere os dados para o próximo agente e repita a execução do script;
-9. Continue repetindo este processo até acadatrar todos os agentes.
+9. Continue repetindo este processo até cadastrar todos os profiles.
 10. Para confirirmos se todos os agentes foram cadastrados no Hermes, execute o comando no terminal `hermes profile list`
     Vamos ter algo como:
+
     ![status2](./img/status_profile2.png)
 
-#### 2. Ativando os Gateways dos Profiles
+11. Para ambiente windows localmente não podemos fechar o terminal, caso contrario os processos dos gateways dos profiles serão encerrados. Já para ambiente VPS isso não oscorre pois o sistema fica rodando 24/7 e só será necessário reiniciar caso seja realmente necessário.
 
-O script de cadastro dos profiles já ativa o gateway para todos, mas caso seja necessário reiniciar podemos ou algum em especifico, primeiramente executar o comando (`hermes profile list`) e verificar qual profile esta com gateway na condição **stopping**;
+#### 2. Reativando os Gateways dos Profiles
+
+Sempre que você estiver rodando localmente e em ambiente Windows será necessário a reativação dos gateways para os profiles de forma manual. Primeiramente executar o comando (`hermes profile list`) e verificar que somente o profile default esta com status "running" os outros profile estão com gateway na condição **stopping**;
 
 ```text
               Hermes Gateway
@@ -172,29 +189,36 @@ O script de cadastro dos profiles já ativa o gateway para todos, mas caso seja 
                     │
           ┌─────────┴─────────┐
           │                   │
-       default             profile
+       default             profiles
        running             stopped
 ```
 
-Abra o terminal e execute o comando para o profile especifico:
+Abra o terminal e execute o comando para cada profile ou execute o script:
 
-⟹ Para sistemas operacionais Windows utilize:
+1. ⟹ Para sistemas operacionais Windows utilize:
 
-```bash
-hermes -p default gateway run --replace > /tmp/default-gateway.log 2>&1 &
-hermes -p time-perfomance gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
-sleep 8
-hermes gateway list
-```
+    Executando por comando
 
-⟹ Para sistemas operacionais Linux utilize:
+    ```bash
+    hermes -p time-perfomance gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
+    sleep 8
+    hermes gateway list
+    ```
 
-```bash
-setsid hermes -p default gateway run --replace > /tmp/default-gateway.log 2>&1 &
-setsid hermes -p time-perfomance gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
-sleep 8
-hermes gateway list
-```
+    Executando por Script -> [wakeup-gateway_win.sh](./scripts/wakeuo-gateway_win.sh)
+    <br/>
+2. ⟹ Para sistemas operacionais Linux utilize:
+
+    Executando por comando
+
+    ```bash
+    setsid hermes -p time-perfomance gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
+    sleep 8
+    hermes gateway list
+    ```
+
+    Executando por escript -> [wakeup-gateway_lin.sh](./scripts/wakeup-gateway_lin.sh)
+
 
 **Ordem importa**:
     - o .env é gravado antes do gateway subir;
