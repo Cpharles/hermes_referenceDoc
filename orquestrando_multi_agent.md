@@ -62,7 +62,9 @@ Responsável pela criação, curadoria e distribuição de conteúdo (textos, v�
 ### Step 1. Identificando seu ID no Telegram
 
 Temos que identificar o ID do nosso Telegram, pois será a partir deste ID que nós estaremos conversando com os bots e vise versa.
-**Obs.:** Caso tenha mais alguém que também vai interagir com os bots através do Telegram, então será necessário que este usuário recupere o número do ID dele para ser cadastrado.
+> **Obs.:**
+> Caso tenha mais alguém que também vai interagir com os bots através do Telegram, então será necessário que este usuário recupere o número do ID dele para ser cadastrado.
+
 Na barra de pesquisa do Telegram, busque por **`User Info`** e clique em @userinfobot. Será aberto uma janela de chat.
 ![id](./img/userinfo.png)
   
@@ -100,12 +102,12 @@ Se selecionarmos a aba **Apps** no Telegram e depois clicar em **BotFather**, po
 Temos que criar os profiles de cada agente dentro do Hermes com seu respectivo Token junto com o ID do orquestrador, e para isso vamos rodar um script no terminal para completar esta configuração.
 
 > Obs.: Para entendendo o que cada linha do script faz, leia os seguintes arquivos:
-    [create-hermes-profile.md](create-hermes-profile.md)
-    [reset_gateway.md](reset_gateway.md)
+    [create-hermes-profile.md](./scripts/create-hermes-profile.md)
+    [reset_gateway.md](./scripts/reset_gateway.md)
     ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
 
-* Para sistemas operacionais Windows utilize o arquivo [create-hermes-profile_win.sh](create-hermes-profile_win.sh).
-* Para sistemas operacionais Linux utilize o arquivo [create-hermes-profile_linux.sh](create-hermes-profile_linux.sh).
+* Para sistemas operacionais Windows utilize o arquivo [create-hermes-profile_win.sh](./scripts/create-hermes-profile_win.sh).
+* Para sistemas operacionais Linux utilize o arquivo [create-hermes-profile_linux.sh](./scripts/create-hermes-profile_linux.sh).
 
 Os comando podem ser diferentes conforme o sistema operacional. Como neste caso eu estou rodando em uma máquina local e a maioria das pessoas utiliza Windows, vou dar o exemplo utilizando comando para o OS Windows, mas a lógica continua a mesma para qualque OS.
 
@@ -142,7 +144,7 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
           running          running                     running
     ```
 
-3. Agora abra o arquivo [create-hermes-profile_win.sh](create-hermes-profile_win.sh) em um editor de coódigo como o Visual Studio Code ou outro editor de código, e coloque **NOME**, **MEU_ID**, **TOKEN** que se encontra no início do script (use a planilha [daddos_profile.xlsx](dados_profiles.xlsx) para auxiliar).
+3. Agora abra o arquivo [create-hermes-profile_win.sh](./scripts/create-hermes-profile_win.sh) em um editor de coódigo como o Visual Studio Code ou outro editor de código, e coloque **NOME**, **MEU_ID**, **TOKEN** que se encontra no início do script (use a planilha [daddos_profile.xlsx](dados_profiles.xlsx) para auxiliar).
 Exemplo:
 
     ```bash
@@ -178,8 +180,8 @@ Observe que no último comando (`hermes profile list`) executado podenos notar q
 
 Precisamos que todos os profiles estejam em running, portanto vamos rodar outro script:
 
-* Para sistemas operacionais Windows utilize o arquivo [reset_gateway_win.sh](reset_gateway_win.sh).
-* Para sistemas operacionais Linux utilize o arquivo [reset_gateway_linux.sh](reset_gateway_linux.sh).
+* Para sistemas operacionais Windows utilize o arquivo [reset_gateway_win.sh](./scripts/reset_gateway_win.sh).
+* Para sistemas operacionais Linux utilize o arquivo [reset_gateway_linux.sh](./scripts/reset_gateway_linux.sh).
 
 **Ordem importa**:
     - o .env é gravado antes do gateway subir;
