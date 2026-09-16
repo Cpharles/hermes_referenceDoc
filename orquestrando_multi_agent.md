@@ -71,7 +71,7 @@ Neste chat, digite `/start`
 Agora podemos ver que o bot retornou o nosso nome de usuário **@username** e logo abaixo temos o **id:XXXXXXXXX**
     - Antes de proceguir vamos preencher uma tabela com os dados gerados, vamos precisar deles mais a frente para rodar os comando de cadastro dentro do Hermes.
     - Abra a planilha [dados_profiles.xlsx](dados_profiles.xlsx):
-        ![planilha](./img/planilha1.png)
+        ![planilha](./img/planilha.png)
 
 ### Step 2. Ciando os Bots no Telegram
 
@@ -88,7 +88,7 @@ Cada agente é um setor ou seja um departamento dentro de uma empresa
     ![bf3](./img/botfather3.png)
   
 Ao termino da criação de todos os agentes teremos uma planilha com os Tokens e o ID do Orquestrador (neste caso você com o nome de Agente CTO)
-    ![planilha2](./img/planilha.png)
+    ![planilha2](./img/planilha1.png)
 
 Se selecionarmos a aba **Apps** no Telegram e depois clicar em **BotFather**, podemos ver que temos a seguinte estrutura de Bots
     ![bf4](./img/botfather4.png)
