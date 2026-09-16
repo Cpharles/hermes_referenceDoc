@@ -8,11 +8,12 @@ Construir um projeto com 5 Agentes com um bot orquestrador das atividades, aplic
 
 Para a execução deste projeto é necessário ter os seguintes recursos:
 
-> * Ter uma VPS (ideal para rodar 24/7) ou utilize o seu PC local (preferencialmente no Docker)
-> * Hermes Agent instalado
-> * Disponibilidade de algum modelo LLM da sua preferencia
-> * Uma conta no Telegram para criarmos os bot (agentes)
-> * Uma conta no Notion para registrarmos a execução do trabalho dos agentes
+> [!IMPORTANT]
+> √ Ter uma VPS (ideal para rodar 24/7) ou utilize o seu PC local (preferencialmente no Docker)
+> √ Hermes Agent instalado
+> √ Disponibilidade de algum modelo LLM da sua preferencia
+> √ Uma conta no Telegram para criarmos os bot (agentes)
+> √ Uma conta no Notion para registrarmos a execução do trabalho dos agentes
 
 ## Estrutura do Projeto
 
@@ -62,7 +63,7 @@ Responsável pela criação, curadoria e distribuição de conteúdo (textos, v�
 ### Step 1. Identificando seu ID no Telegram
 
 Temos que identificar o ID do nosso Telegram, pois será a partir deste ID que nós estaremos conversando com os bots e vise versa.
-> **Obs.:**
+> [!TIP]
 > Caso tenha mais alguém que também vai interagir com os bots através do Telegram, então será necessário que este usuário recupere o número do ID dele para ser cadastrado.
 
 Na barra de pesquisa do Telegram, busque por **`User Info`** e clique em ==@userinfobot==, será aberto uma janela de chat.
@@ -112,9 +113,8 @@ Se selecionarmos a aba **Apps** no Telegram e depois clicar em **BotFather**, po
 
 Temos que criar os profiles de cada agente dentro do Hermes com seu respectivo Token junto com o ID do orquestrador, e para isso vamos rodar um script no terminal para completar esta configuração.
 
-> Obs.: Para entendendo o que cada linha do script faz, leia os seguintes arquivos:
-    [create-profile_win.md](./scripts/create-profile_win.md)
-    ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
+> [!NOTE] Para entendendo o que cada linha do script faz, leia os seguintes arquivos: [create-profile_win.md](./scripts/create-profile_win.md)
+> ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
 
 * Para sistemas operacionais Windows utilize o arquivo [create-profile_win.sh](./scripts/create-profile_win.sh)
 * Para sistemas operacionais Linux utilize o arquivo [create-profile_lin.sh](./scripts/create-profile_lin.sh)
@@ -194,7 +194,7 @@ Primeiramente executar o comando (`hermes profile list`) para verificar que some
        running             stopped
 ```
 
-[!NOTE] Se você estiver em um servidor e o mesmo foi reiniciado, este procedimento de reativação dos gateway dos profiles será necessário também.
+>[!WARNING] Se você estiver em um servidor e o mesmo foi reiniciado, este procedimento de reativação dos gateway dos profiles será necessário também.
 
 Abra o terminal e execute o comando para cada profile ou execute o script:
 
@@ -236,6 +236,28 @@ Agora vamos confirmar a criação dos perfil utilizando o comando `hermes profil
 
 Com os profiles com status **running**, agora vamos acordar os bots no Telegram, cada um precisa receber o primeiro /start pra começar a responder pelo agente.
 
-1. Abra o seu Telegram e busque pela aba **Apps** e clique em **BotFather**
-2. Selecione um bot de cada vez e de o comando `/start`
+1. Abra o seu Telegram e busque pela aba **Chats**, clique em perquisa e digite o **Username do Bot**
+
+    ![startbot](./img/start_bot1.png)
+
+2. Selecione o bot e o chat deste bot vai ser carregado
+3. Clique no botão `START`
+
+## 4. Organizar a empresa no Telegram
+
+Agora vamos organizar a estrutura da nossa empresa dentro do Telegram onde teremos uma pasta da empresa, um grupo por time, e o bot do agente dentro de cada grupo.
+A lógica da organização:
+
+* Cada grupo é um andar de um prédio;
+* a pasta da empresa é o que junta os andares num prédio só;
+* e cada agente entra no seu andar.
+
+### Step 1. Criar um grupo por time
+
+Um grupo pra cada setor da empresa: Performance, CS, Comercial, Conteúdo, Pedagógico.
+
+### Step 2. Criar a Pasta da Empresa
+
+### Step 3. Adcionar o Agente de Cada Grupo
+
 
