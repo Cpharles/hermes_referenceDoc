@@ -1,6 +1,8 @@
-# HERMES AGENT - PROJECTS REFERENCE DOCUMENTS
+# HERMES AGENT  
 
 ![1](./img/banner.png)
+
+## EXEMPLO DE PROJETOS COM APLICAÇÃO REAL
 
 ## Objetivo deste Documento
 
@@ -22,7 +24,8 @@ A propria literatura do Hermes Agent da Nous Research, é um projeto open source
 
 Um framework não é simplesmente uma aplicação pronta. Ele fornece uma estrutura arquitetural reutilizável para construir ou executar aplicações de determinado tipo.
 No Hermes, temos vários componentes que formam essa infraestrutura:
-```
+
+```text
                     HERMES AGENT
                          │
         ┌────────────────┼────────────────┐
