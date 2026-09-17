@@ -11,10 +11,10 @@ set -u
 # 1. CONFIGURAÇÃO DO NOVO PROFILE
 # ============================================================
 
-NOME="<YOUR_PROFILE_NAME>"  # Exemplo: "meu-profile"
-MEU_ID="<TELEGRAM_ALLOWED_USERS>"
-TOKEN="<YOUR_TELEGRAM_BOT_TOKEN>"
-
+MEU_ID="<TELEGRAM_ALLOWED_USERS>"            # User ID -> TELEGRAM_ALLOWED_USERS, TELEGRAM_HOME_CHANNEL
+CHANNEL_NAME="<BOT_NAME>"                    # Bot name -> TELEGRAM_HOME_CHANNEL_NAME
+PROFILE_NAME="<YOUR_PROFILE_NAME>"           # Profile name
+BOT_TOKEN="<YOUR_TELEGRAM_BOT_TOKEN>"        # TELEGRAM_BOT_TOKEN
 
 # ============================================================
 # 2. CAMINHOS
@@ -22,9 +22,9 @@ TOKEN="<YOUR_TELEGRAM_BOT_TOKEN>"
 
 HERMES_HOME="$HOME/AppData/Local/hermes"
 GLOBAL_ENV="$HERMES_HOME/.env"
-PROFILE_DIR="$HERMES_HOME/profiles/$NOME"
+PROFILE_DIR="$HERMES_HOME/profiles/$PROFILE_NAME"
 ENV_FILE="$PROFILE_DIR/.env"
-LOG_FILE="/tmp/$NOME-gateway.log"
+LOG_FILE="/tmp/$PROFILE_NAME-gateway.log"
 
 
 # ============================================================
@@ -52,12 +52,13 @@ echo " Hermes Agent - Criação de Profile"
 echo "============================================================"
 echo
 
-echo "Profile: $NOME"
+echo "Profile: $PROFILE_NAME"
 echo
 
-[[ -n "$NOME" ]] || erro "NOME não foi definido."
+[[ -n "$PROFILE_NAME" ]] || erro "NOME não foi definido."
+[[ -n "$CHANNEL_NAME" ]] || erro "CHANNEL_NAME não foi definido."
 [[ -n "$MEU_ID" ]] || erro "MEU_ID não foi definido."
-[[ -n "$TOKEN" ]] || erro "TOKEN não foi definido."
+[[ -n "$BOT_TOKEN" ]] || erro "TOKEN não foi definido."
 
 ok "Variáveis básicas encontradas."
 
@@ -100,7 +101,7 @@ ok "OPENROUTER_API_KEY encontrada no .env global."
 if [[ -d "$PROFILE_DIR" ]]; then
 
     echo
-    echo "⚠ O profile '$NOME' já existe:"
+    echo "⚠ O profile '$PROFILE_NAME' já existe:"
     echo "$PROFILE_DIR"
     echo
 
@@ -110,7 +111,7 @@ if [[ -d "$PROFILE_DIR" ]]; then
     echo
     echo "Se deseja recriá-lo é necessário apagalo antes, execute o comando:"
     echo
-    echo "    hermes profile delete $NOME"
+    echo "    hermes profile delete $PROFILE_NAME"
     echo
     echo "Ou altere o nome do profile na variável NOME no início do script."
     echo "Em seguida, execute novamente este script."
@@ -124,9 +125,9 @@ fi
 # ============================================================
 
 echo
-echo "→ Criando profile: '$NOME'..."
+echo "→ Criando profile: '$PROFILE_NAME'..."
 
-if ! hermes profile create "$NOME" --clone-from default; then
+if ! hermes profile create "$PROFILE_NAME" --clone-from default; then
     erro "Falha ao criar o profile."
 fi
 
@@ -158,6 +159,7 @@ echo "→ Configurando API OpenRouter e Telegram..."
 # O restante do .env permanece intacto.
 
 sed -i '/^OPENROUTER_API_KEY=/d' "$ENV_FILE"
+sed -i '/^TELEGRAM_HOME_CHANNEL_NAME=/d' "$ENV_FILE"
 sed -i '/^TELEGRAM_ALLOWED_USERS=/d' "$ENV_FILE"
 sed -i '/^TELEGRAM_HOME_CHANNEL=/d' "$ENV_FILE"
 sed -i '/^TELEGRAM_BOT_TOKEN=/d' "$ENV_FILE"
@@ -167,9 +169,10 @@ sed -i '/^TELEGRAM_BOT_TOKEN=/d' "$ENV_FILE"
 
 printf '%s\n' \
     "OPENROUTER_API_KEY=$OPENROUTER_API_KEY" \
+    "TELEGRAM_HOME_CHANNEL_NAME=$CHANNEL_NAME" \
     "TELEGRAM_ALLOWED_USERS=$MEU_ID" \
     "TELEGRAM_HOME_CHANNEL=$MEU_ID" \
-    "TELEGRAM_BOT_TOKEN=$TOKEN" \
+    "TELEGRAM_BOT_TOKEN=$BOT_TOKEN" \
     >> "$ENV_FILE"
 
 ok "Configurações adicionadas."
@@ -184,6 +187,9 @@ echo "→ Validando configuração..."
 
 grep -q '^OPENROUTER_API_KEY=' "$ENV_FILE" \
     || erro "OPENROUTER_API_KEY não foi configurada."
+
+grep -q '^TELEGRAM_HOME_CHANNEL_NAME=' "$ENV_FILE" \
+    || erro "TELEGRAM_HOME_CHANNEL_NAME não foi configurada."
 
 grep -q '^TELEGRAM_ALLOWED_USERS=' "$ENV_FILE" \
     || erro "TELEGRAM_ALLOWED_USERS não foi configurada."
@@ -205,11 +211,13 @@ echo
 echo "Configuração do profile:"
 echo "----------------------------------------"
 
-echo "Profile: $NOME"
+echo "Profile: $PROFILE_NAME"
 echo "ENV:     $ENV_FILE"
 
 grep '^OPENROUTER_API_KEY=' "$ENV_FILE" \
     | sed 's/=.*/=***REDACTED***/'
+
+grep '^TELEGRAM_HOME_CHANNEL_NAME=' "$ENV_FILE"
 
 grep '^TELEGRAM_ALLOWED_USERS=' "$ENV_FILE"
 
@@ -231,7 +239,7 @@ echo "→ Iniciando gateway do profile..."
 # Windows + Git Bash:
 # NÃO utilizar setsid.
 
-hermes -p "$NOME" gateway run --replace \
+hermes -p "$PROFILE_NAME" gateway run --replace \
     > "$LOG_FILE" 2>&1 &
 
 GATEWAY_PID=$!
@@ -260,7 +268,7 @@ echo "→ Verificando profiles..."
 
 PROFILE_STATUS=$(
     hermes profile list 2>/dev/null \
-    | awk -v profile="$NOME" '$1 == profile {print $3}'
+    | awk -v profile="$PROFILE_NAME" '$1 == profile {print $3}'
 )
 
 
@@ -276,7 +284,7 @@ if [[ "$PROFILE_STATUS" == "running" ]]; then
     echo " ✅ PROFILE CRIADO E ATIVO"
     echo "============================================================"
     echo
-    echo "Profile : $NOME"
+    echo "Profile : $PROFILE_NAME"
     echo "Status  : running"
     echo "PID     : $GATEWAY_PID"
     echo "Log     : $LOG_FILE"

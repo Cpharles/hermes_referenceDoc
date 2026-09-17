@@ -107,14 +107,33 @@ Se selecionarmos a aba **Apps** no Telegram e depois clicar em **BotFather**, po
 
 ![bf4](./img/botfather4.png)
 
+### Step 3. Ativar todos os bots
+
+Agora vamos ativar (acordar) os bots no Telegram, cada um precisa receber um comando `/start` e assim, começar um chat com este agente.
+Temos dois caminhos para acordar os bots:
+
+1. Pela barra de pesquisa:
+    1. Abra o seu Telegram e busque pela aba **Chats**, clique em perquisa e digite o **Username Bot**
+
+        ![startbot1](./img/start_bot1.png)
+
+    2. Selecione o bot e o chat deste bot vai ser carregado
+    3. Clique no botão `START`
+2. Pelo BotFather:
+    1. Abra o seu Telegram e busqu8e pela aba **Apps**, clique ou busque por **BotFather**, será aberto a janela do botfather com a lista dos seus bots.
+    2. Clique no bot que será acordado e em seguida clique no **PROFILE_NAME** (neste caso: `@agente_content_bot`)
+        ![startbo2](./img/start_bot2.png)
+    3. Note que a janela de chat deste bot é carregada, então finalize clicando no botão `START`
+
 ## 2. Configuração dos Profiles no Hermes
 
 ### Step 1. Criando Profiles Hermes
 
 Temos que criar os profiles de cada agente dentro do Hermes com seu respectivo Token junto com o ID do orquestrador, e para isso vamos rodar um script no terminal para completar esta configuração.
 
-> [!NOTE] Para entendendo o que cada linha do script faz, leia os seguintes arquivos: [create-profile_win.md](./scripts/create-profile_win.md)
-> ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
+> [!WARNING] Para entendendo o que cada linha do script faz, leia os seguintes arquivos:
+    ⇒ [create-profile_win.md](./scripts/create-profile_win.md)
+    Ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
 
 * Para sistemas operacionais Windows utilize o arquivo [create-profile_win.sh](./scripts/create-profile_win.sh)
 * Para sistemas operacionais Linux utilize o arquivo [create-profile_lin.sh](./scripts/create-profile_lin.sh)
@@ -172,7 +191,7 @@ Exemplo:
 7. Aguarde o processor finalizar acompanhando os outputs no terminal;
 8. Depois, abra novamente o arquivo e altere os dados para o próximo agente e repita a execução do script;
 9. Continue repetindo este processo até cadastrar todos os profiles.
-10. Para confirirmos se todos os agentes foram cadastrados no Hermes, execute o comando no terminal `hermes profile list`
+10. Para conferirmos se todos os agentes foram cadastrados no Hermes, execute o comando no terminal `hermes profile list`
     Vamos ter algo como:
 
     ![status2](./img/status_profile2.png)
@@ -194,7 +213,7 @@ Primeiramente executar o comando (`hermes profile list`) para verificar que some
        running             stopped
 ```
 
->[!WARNING] Se você estiver em um servidor e o mesmo foi reiniciado, este procedimento de reativação dos gateway dos profiles será necessário também.
+>[!WARNING] Se você estiver em um servidor e o mesmo foi reiniciado, este procedimento de reativação dos gateway dos profiles, também será necessário.
 
 Abra o terminal e execute o comando para cada profile ou execute o script:
 
@@ -209,6 +228,9 @@ Abra o terminal e execute o comando para cada profile ou execute o script:
     ```
 
     Executando por Script -> [wakeup-gateway_win.sh](./scripts/wakeuo-gateway_win.sh)
+    Em seguida confirmamos o status dos perfil utilizando o comando `hermes profile list`
+    E para ver as portas que cada Gateway esta rodando utilize o comando `hermes gateway list`
+        ![statusgateway](./img/status_profile3.png)
     <br/>
 2. ⟹ Para sistemas operacionais Linux utilize:
 
@@ -221,29 +243,18 @@ Abra o terminal e execute o comando para cada profile ou execute o script:
     ```
 
     Executando por escript -> [wakeup-gateway_lin.sh](./scripts/wakeup-gateway_lin.sh)
+    Em seguida confirmamos o status dos perfil utilizando o comando `hermes profile list`
+    E para ver as portas que cada Gateway esta rodando utilize o comando `hermes gateway list`
 
-**Ordem importa**:
+> [!NOTE] **Ordem importa**:
     - o .env é gravado antes do gateway subir;
     - se inverter, dois profiles disputam o mesmo token e o bot fica mudo.
     - Cole um bloco de cada vez e espere os 8 segundos do sleep.
     - “Errno 98” na porta 8643 é normal: o primeiro gateway pega a porta de métricas, os outros reclamam e seguem.
     - A reativação é uma linha por profile de propósito, o shell do Hermes recusa for/done.
-    - Se algum profile não subir, consulte o log localizado no diretório do Hermes que está em **`/tmp/<nome>-gateway.log`**
+    - Se algum profile não subir, consulte o log localizado no diretório do próprio profile que está em **`profiles/<profile_name>/logs/gateway.log`**
 
-Agora vamos confirmar a criação dos perfil utilizando o comando `hermes profile list`
-
-## 3. Ativar todos os bots
-
-Com os profiles com status **running**, agora vamos acordar os bots no Telegram, cada um precisa receber o primeiro /start pra começar a responder pelo agente.
-
-1. Abra o seu Telegram e busque pela aba **Chats**, clique em perquisa e digite o **Username do Bot**
-
-    ![startbot](./img/start_bot1.png)
-
-2. Selecione o bot e o chat deste bot vai ser carregado
-3. Clique no botão `START`
-
-## 4. Organizar a empresa no Telegram
+## 3. Organizar a empresa no Telegram
 
 Agora vamos organizar a estrutura da nossa empresa dentro do Telegram onde teremos uma pasta da empresa, um grupo por time, e o bot do agente dentro de cada grupo.
 A lógica da organização:
@@ -252,12 +263,48 @@ A lógica da organização:
 * a pasta da empresa é o que junta os andares num prédio só;
 * e cada agente entra no seu andar.
 
+    ![organizando](./img/organizando1.png)
+
 ### Step 1. Criar um grupo por time
 
-Um grupo pra cada setor da empresa: Performance, CS, Comercial, Conteúdo, Pedagógico.
+Vamos criar um grupo pra cada setor da empresa: Performance, SAC, Comercial, Conteúdo, Pedagógico.
+
+1. No Telegram selecione a aba **Unread** (mas pode ser outra) e clique no icone de um lápis no rodapé da tela
+2. Um menu será mostrado, clique em **New Group**
+    ![grupo1](./img/grupo1.png) ![grupo2](./img/grupo2.png)
+3. Nesta nova janela localise no rodapé uma seta, clique sobre ela e podemos ver agora uma janela para entrarmos com o nome deste novo grupo (neste exemplo estou entrando com o nome do "Time de Performance"), finalise clicando na seta no rodapé da pagina
+    ![grupo3](./img/grupo3.png)
+4. Podemos observar que foi carregado um chat vazio com o nome do nosso grupo na parte superior
+    ![grupo4](./img/grupo4.png)
+5. Agora repita os passos para criar os outros grupos
+    ![grupo5](./img/grupo5.png)
 
 ### Step 2. Criar a Pasta da Empresa
 
+1. No Telegram posicione o ponteiro do mouse sobre a aba **All** e clique com o botão direito do mouse e clique em **Edit folders**, em seguida clique em **CRIAR PASTA**
+
+    ![pasta1](./img/pasta1.png) ![pasta2](./img/pasta2.png)
+2. Dê o nome da dua empresa ou do departamento principal, responssável pelos grupos.
+3. Em seguida adicione todos os grupos que criamos para esta pasta, confirme no tick no canto superior direito
+    ![pasta3](./img/pasta3.png) ![pasta4](./img/pasta4.png)
+4. Verifique se todos os grupos foram incluidos e confirme a criação da pasta clicando no tick no canto superior direito.
+    ![pasta5](./img/pasta5.png) ![pasta6](./img/pasta6.png)
+5. Agora podemos observar que a pasta da empresa foi criada e se encontra como uma aba logo abaico da barra de pesquisa.
+    ![pasta7](./img/pasta7.png) ![pasta8](./img/pasta8.png)
+
 ### Step 3. Adcionar o Agente de Cada Grupo
 
-
+1. Vamos adicionar cada Agente no seu respectivo Grupo, selecione e clique em um agente (neste caso será o Agente de Performance), será carregado o chat deste agente
+2. Clique nos 3 pontinhos que esta no canto superior direito e selecione **Adicionar para Grupo**
+    ![ag->grp1](./img/ag_to_grp1.png)
+3. Na próxima janela teremos a lista com os grupos para onde o agente será adicionado, neste caso selecione o drupo Time de Performance e confirme.
+4. Agora entre no grupo do Time de Performance e clique sobre o título do grupo, perceba que será apresentado um popup "Grupo Info" onde temos 2 membros e o Agente de Performance
+    ![ag->grp2](./img/ag_to_grp2.png)
+5. Clique sobre o lápis para editar o grupo e role para baixo até encontrar a opção **Administrators** (Administradores), neste caso só temos 1, que é você, mas queremos que o nosso agente passe a ser o administrador deste grupo também e para isso clique em Administrador
+6. Uma nova janela é apresentada e confirma que temos somente um administrador, agora clique em adicionar no botão na parte inferior direita (1) e depois selecione o agente (2)
+    ![ag->grp3](./img/ag_to_grp3.png) ![ag->grp4](./img/ag_to_grp4.png)
+7. É apresentado a janela com as opções de administrador, teremos que ativar a opção **Add New Admins** (1) (Adcionar Novo Administrador) e em seguida comfirmar (2)
+    ![AG->GRP5](./img/ag_to_grp5.png)
+8. Retorne atá a tela de chat, deppois clique novamente sobre o nome do grupo para entrar na tela da informação do grupo, repare que agora o nosso agente esta como **admin** e se você verificar a imagem no item 4, verá que esta opção não estava ativa para o nosso agente.
+    ![ag->grp6](./img/ag_to_grp6.png)
+9. Repita todos os passos anteriores para fazer o mesmo para os outros agentes
