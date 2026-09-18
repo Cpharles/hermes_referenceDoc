@@ -1,23 +1,27 @@
 # HERMES AGENT  
 
-![1](./img/banner.png)
+![banner](./img/banner.png)
 
 ## EXEMPLO DE PROJETOS COM APLICAÇÃO REAL
 
 ## Objetivo deste Documento
 
-Navegando na web eu pude entrontrar vários entusiastas de automação comentando sobre a utilização do **Hermes Agent da Nous Research**, mas a grande maioria esta abordando o mesmo asunto que é a instalação e configurações básicas, que também é fundamental para quem esta tendo o primeiro contato com esta ferramenta (agente), mas que esta carente de demostração e documentação com explicação detalhada de como colocar em uso.
+Navegando na web eu pude entrontrar vários entusiastas de automação comentando sobre a utilização do **Hermes Agent da Nous Research**, mas a grande maioria esta abordando o mesmo asunto que é a instalação e configurações básicas, que também é fundamental para quem esta tendo o primeiro contato com esta ferramenta (agente), mas esta carente de demostração e documentação com explicação detalhada de como colocar em uso.
 
-Pensando nisso e partindo de uma necessidade pessoal, descidi documentar algumas aplicações de uso do Hermes Agent em projetos reais conforme eu vou estudando, tanto para minha consulta futura assim como, compartirlhar com outros que querenter uma documentação prática com caso de uso.
-Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto de vista o que é o **Hermes Agent** e para que serve.
-Caso queira pular esta parte introdutória e ir direto para os "Tutoriais", escoha na lista abaixo:
+Pensando nisso e partindo de uma necessidade pessoal, descidi documentar algumas aplicações de uso do Hermes Agent em projetos reais conforme eu vou estudando, tanto para minha consulta futura assim como, compartirlhar com outros que querem ter uma documentação prática com caso de uso.
+Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto de vista do que se trata e o que é o **Hermes Agent**.
 
-* ➩ [Orquestrando multiplos agentes](orquestrando_multi_agent.md)
+> [!NOTE]
+  Caso queira pular esta parte introdutória e ir direto para os "**Projetos**", escoha na lista abaixo:
+
+* ➩ [Orquestrando multiplos agentes pelo Telegram](orquestrando_multi_agent-Telegram.md)
 * ➩ [Configurando memoria persistente] Em breve
 
 > Documentação Oficial:
     - Para uma consulta mais apurada dos comandos, recomendo consultar a documentação oficial do Hermes Agent em [Docs](https://hermes-agent.nousresearch.com/docs)
     - Pagina oficial do projeto no [GitHub](https://github.com/NousResearch/hermes-agent)
+
+</br>
 
 ## Entendendo o Hermes Agent
 
@@ -26,7 +30,7 @@ O Hermes Agent pode ser chamado de framework, mas arquiteturalmente ele é mais 
 
 A propria literatura do Hermes Agent da Nous Research, é um projeto open source sob licença MIT e possui CLI, memória persistente, skills, ferramentas, MCP, subagentes, automações e diferentes backends de execução.
 
-### 1. Por que o Hermes Agent é considerado um framework?
+### 1. Por que o Hermes Agent pode ser considerado um framework?
 
 Um framework não é simplesmente uma aplicação pronta. Ele fornece uma estrutura arquitetural reutilizável para construir ou executar aplicações de determinado tipo.
 No Hermes, temos vários componentes que formam essa infraestrutura:
