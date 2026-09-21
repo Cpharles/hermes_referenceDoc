@@ -12,16 +12,16 @@ Pensando nisso e partindo de uma necessidade pessoal, descidi documentar algumas
 Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto de vista do que se trata e o que é o **Hermes Agent**.
 
 > [!NOTE]
-  Caso queira pular esta parte introdutória e ir direto para os "**Projetos**", escoha na lista abaixo:
-
-* ➩ [Orquestrando multiplos agentes pelo Telegram](orquestrando_multi_agent-Telegram.md)
-* ➩ [Configurando memoria persistente] Em breve
+> ➩ Criando multiplos Profiles e controlando pelo Telegram: [orquestrando_multi_agent-Telegram.md](orquestrando_multi_agent-Telegram.md)
+> ➩ Configurando a Identidade e a Descrição dos Profiles: [profile_identity_describe.md](profile_identity_describe.md)
+> ➩ Configurando memória persistente: Em breve
 
 > Documentação Oficial:
-    - Para uma consulta mais apurada dos comandos, recomendo consultar a documentação oficial do Hermes Agent em [Docs](https://hermes-agent.nousresearch.com/docs)
-    - Pagina oficial do projeto no [GitHub](https://github.com/NousResearch/hermes-agent)
-
+    - Pagina oficial do projeto no GitHub: [Hermes-Agent](https://github.com/NousResearch/hermes-agent)
+    - Recomendo consultar a documentação oficial do Hermes Agent: [Docs](https://hermes-agent.nousresearch.com/docs)
 </br>
+
+---
 
 ## Entendendo o Hermes Agent
 
