@@ -2,12 +2,25 @@
 
 ## Entendendo a diferença entre "Identidade" e "Descrição"
 
-Quando criamos os profiles o proprio Hermes já se encarrega de criar tanto a **Identidade** (Personalidade) com a **Descrição** para o novo Agente (Profile). No caso da identidade, basicamente ele copía do profile **default** que é uma identidade genérica. Já para a descrição o Hermes presume a partir da analise do nome, mas nem sempre é realmente o que queremos. Portanto a melhor forma de termos controle sobre como o agente vai trabalhar é dando uma boa identidade e descrição de sua função, quase como a descrição de cargos e funções dentro de uma empresa.
+Quando criamos os profiles o proprio Hermes já se encarrega de criar tanto a **Identidade** (Personalidade/Identidade) como a **Descrição** para o novo Agente (Profile). No caso da identidade, basicamente ele copía do profile **default** que é uma identidade genérica. Já para a descrição o Hermes presume a partir da analise do nome, mas nem sempre é realmente o que queremos. Portanto a melhor forma de termos controle sobre como o agente vai trabalhar é dando uma boa identidade e descrição de sua função, quase como a descrição de cargos e funções dentro de uma empresa.
 
 Em um sistema multi-agente como o Hermes, um **Profile** é a configuração completa que define um agente.
 Ele possui dois componentes distintos que operam em níveis diferentes do sistema:
 
-### 1. Descrição (profile.yaml) — o que o agente *faz***
+### 1. Identidade (SOUL.md) — quem o agente *é***
+
+> [!TIP]
+> :brain: **Documentação oficial:**
+> [Identidade - SOUL.md](https://hermes-agent.nousresearch.com/docs/user-guide/features/personality)
+
+- É o conteúdo carregado como **slot #1 do system prompt**, ou seja, entra na janela de contexto do modelo a cada execução;
+- Define **comportamento interno**: personalidade, valores, instruções operacionais, limites, tom de voz e método de trabalho;
+- Responde à pergunta: *"como este agente pensa e age?"*;
+- Só é vista pelo **modelo de linguagem** — nem o orquestrador nem outros agentes a leem;
+- Formato: arquivo markdown livre (`~/.hermes/profiles/<profile_name>/SOUL.md`), sem limite prático de extensão;
+- Impacta diretamente a **qualidade da execução** das tarefas.
+
+### 2. Descrição (profile.yaml) — o que o agente *faz***
 
 > [!TIP]
 > :brain: **Documentação oficial:**
@@ -22,20 +35,6 @@ Ele possui dois componentes distintos que operam em níveis diferentes do sistem
 - Nunca entra no prompt do modelo — o agente não conhece a própria descrição;
 - Formato: arquivo yaml (`~/.hermes/profiles/<profile_name>/profile.yaml`), ideal que seja no máximo em 2 frases.
 - Impacta diretamente a **eficiência da delegação** de tarefas.
-
-### 2. Identidade (SOUL.md) — quem o agente *é***
-
-> [!TIP]
-> :brain: **Documentação oficial:**
-> [Identidade - SOUL.md](https://hermes-agent.nousresearch.com/docs/user-guide/features/personality)
-
-- É o conteúdo carregado como **slot #1 do system prompt**, ou seja, entra na janela de contexto do modelo a cada execução;
-- Define **comportamento interno**: personalidade, valores, instruções operacionais, limites, tom de voz e método de trabalho;
-- Responde à pergunta: *"como este agente pensa e age?"*;
-- Só é vista pelo **modelo de linguagem** — nem o orquestrador nem outros agentes a leem;
-- Formato: arquivo markdown livre (`~/.hermes/profiles/<profile_name>/SOUL.md`), sem limite prático de extensão;
-- Impacta diretamente a **qualidade da execução** das tarefas.
-
 
 | Arquivo | O que guarda |
 |---|---|

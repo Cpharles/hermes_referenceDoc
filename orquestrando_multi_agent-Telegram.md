@@ -9,11 +9,11 @@ Construir um projeto com 5 Agentes com um bot orquestrador das atividades, aplic
 Para a execução deste projeto é necessário ter os seguintes recursos:
 
 > [!IMPORTANT]
-> * Ter uma VPS (ideal para rodar 24/7) ou utilize o seu PC local (preferencialmente no Docker)  
-> * Hermes Agent instalado  
-> * Disponibilidade de algum modelo LLM da sua preferencia  
-> * Uma conta no Telegram para criarmos os bot (agentes)  
-> * Uma conta no Notion para registrarmos a execução do trabalho dos agentes  
+> 1_ Ter uma VPS (ideal para rodar 24/7) ou utilize o seu PC local (preferencialmente no Docker)
+> 2_ Hermes Agent instalado  
+> 3_ Disponibilidade de algum modelo LLM da sua preferencia  
+> 4_ Uma conta no Telegram para criarmos os bot (agentes)  
+> 5_ Uma conta no Notion para registrarmos a execução do trabalho dos agentes  
 
 ## Estrutura do Projeto
 
@@ -81,9 +81,9 @@ Agora podemos ver que o bot retornou o nosso nome de usuário **@username** e lo
 
 * Antes de proceguir vamos preencher uma tabela com os dados gerados, vamos precisar deles mais a frente para rodar o script de cadastro dos profiles dentro do Hermes.
 
-* Abra a planilha [dados_profiles.xlsx](./telegram/dados_profiles.xlsx):
+* Abra a planilha [referencias_profiles.xlsx](./telegram/referencias_profiles.xlsx):
 
-    ![planilha](./telegram/img/planilha.png)
+    ![planilha](./img/planilha.png)
 
 ### Step 2. Ciando os Bots no Telegram
 
@@ -93,7 +93,7 @@ Cada agente é um setor ou seja um departamento dentro de uma empresa
 1. Abra o telegram e pesquise por BotFather na aba **Apps**.
 
     ![bf1](./telegram/img/botfather.png)  
-  
+
 2. Clique em `Create a New Bot`.
 
     ![bf2](./telegram/img/botfather2.png)
@@ -104,7 +104,7 @@ Cada agente é um setor ou seja um departamento dentro de uma empresa
   
 Ao termino da criação de todos os agentes teremos uma planilha com os Tokens e o ID do Orquestrador (neste caso você com o nome de Agente CEO)
 
-![planilha2](./telegram/img/planilha1.png)
+![planilha2](./img/planilha1.png)
 
 Se selecionarmos a aba **Apps** no Telegram e depois clicar em **BotFather**, podemos ver que temos a seguinte estrutura de Bots
 

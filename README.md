@@ -1,6 +1,6 @@
 # HERMES AGENT  
 
-![banner](./img/banner.png)
+![banner](./img/banner2.png)
 
 ## EXEMPLO DE PROJETOS COM APLICAÇÃO REAL
 
