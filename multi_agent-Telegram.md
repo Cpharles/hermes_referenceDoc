@@ -58,7 +58,7 @@ Responsável pela criação, curadoria e distribuição de conteúdo (textos, v�
 
 ---
 
-## 1. Configurações no Telegram
+## 1. CONFIGURANDO OS BOTS NO TELEGRAM
 
 > [!NOTE]
     Os prints do Telegram estão rodando em sistema **Android**, portanto para quem utiliza sistemas **IOS** os caminhos serão um pouco diferentes
@@ -130,25 +130,22 @@ Temos dois caminhos para acordar os bots:
 
     3. Note que a janela de chat deste bot é carregada, então finalize clicando no botão `START`
 
-## 2. Configuração dos Profiles no Hermes
+---
+
+## 2. CONFIGURANDO OS PROFILES NO HERMES
 
 ### Step 1. Criando Profiles Hermes
 
-Temos que criar os profiles de cada agente dentro do Hermes com seu respectivo Token junto com o ID do orquestrador, e para isso vamos rodar um script no terminal para completar esta configuração.
-
-> [!IMPORTANT] Para entendendo o que cada linha do script faz, leia os seguintes arquivos:
-    ⇒ [create-profile_win.md](./telegram/scripts/create-profile_win.md)
-    Ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
-
-* Para sistemas operacionais Windows utilize o arquivo [create-profile_win.sh](./telegram/scripts/create-profile_win.sh)
-* Para sistemas operacionais Linux utilize o arquivo [create-profile_lin.sh](./telegram/scripts/create-profile_lin.sh)
-
-Os comando podem ser diferentes conforme o sistema operacional. Como neste caso eu estou rodando em uma máquina local e a maioria das pessoas utiliza Windows, vou dar o exemplo utilizando comando para o OS Windows, mas a lógica continua a mesma para qualque OS.
-
-### Step 2. Verificando o status dos profiles no Hermes
+Quando fazemos a instalação do Hermes Agent obrigatoriamente temos que configurar um **profile default** que é uma exigência do Hermes seguindo o passo a passo fornecido pelo instalador que fará algumas perguntas para confirmações e fornecer algumas informações. Caso vc já tenha instalado e tenha vários profiles, não é necessário desistalar, apenas escolha qual dos profiles e de preferencia o promeiro que foi criado para ser setado como agente default.
+Para saber a insformação do seu profile default vamos executar:
 
 1. Abra o terminal **Git Bash** ou o terminal CLI local do seu VPS na seção do Hermes (para acessa-lo é necessário ter o [Git instalado](https://git-scm.com/install/windows))
-2. Execute o seguinte comando no terminal: `hermes profile list`
+2. Execute o seguinte comando no terminal:
+
+    ```bash
+    hermes profile list
+    ```
+
     Podemos verificar que temos inicialmente somente o profile padrão que é chamado de **default**. Este profile é criado na primeira vez que você instala o Hermes Agent.
 
     ![status1](./telegram/img/status_profile1.png)
@@ -180,86 +177,15 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
           running          running                     running
     ```
 
-3. Agora abra o arquivo [create-profile_win.sh](./telegram/scripts/create-profile_win.sh) em um editor de coódigo (IDE) de sua preferência:
-    Este são alguns exemplos, mas tem uma dezena de IDE para códigos
-    * [Visual Studio Code_MicroSoft](https://code.visualstudio.com/download?_exp_download=fb315fc982)
-    * [Antigravity IDE_Google](https://antigravity.google/product/antigravity-ide)
-    * [NotePad++](https://notepad-plus-plus.org/downloads/)
-
-    Edite o arquivo e coloque **NOME**, **MEU_ID**, **TOKEN** que se encontra no início do script (use a planilha [daddos_profile.xlsx](./telegram/dados_profiles.xlsx) para auxiliar).
-    Exemplo:
-
-    ```bash
-    NOME=time-perfomance
-    MEU_ID=(gerado no item 1 ao rodar o @userinfobot)
-    TOKEN=(gerado no item 2 quando criado o bot)
-    ```
-
-4. Salve o arquivo e depois retorne ao terminal Bash;
-5. Navegue pelo terminal até a pasta onde se encontra os arquivos;
-6. Execute o script com o seguinte comando:  
-    `bash create-profile_win.sh`
-7. Aguarde o processor finalizar acompanhando os outputs no terminal;
-8. Depois, abra novamente o arquivo e altere os dados para o próximo agente e repita a execução do script;
-9. Continue repetindo este processo até cadastrar todos os profiles.
-10. Para conferirmos se todos os agentes foram cadastrados no Hermes, execute o comando no terminal `hermes profile list`
-    Vamos ter algo como:
-
-    ![status2](./telegram/img/status_profile2.png)
-
-11. Para ambiente windows localmente não podemos fechar o terminal, caso contrario os processos dos gateways dos profiles serão encerrados. Já para ambiente VPS isso não oscorre pois o sistema fica rodando 24/7 e só será necessário reiniciar caso seja realmente necessário.
-
-### Step 3. Reativando os Gateways dos Profiles
-
-Sempre que você estiver rodando localmente em uma VPS em ambiente Linux/Windows será necessário a reativação dos gateways para os profiles de forma manual sempre que:
-    1. Atualizar o Hermes Agent
-    2. Precisou parar o Hermes por algum motivo
-    3. O servidor (VPS) foi reiniciado
-    Nestes casos podemos primeiramente executar o comando (`hermes profile list`) para verificar se os gateways estão com status **running** ou **stopped**.
-
-```text
-              Hermes Gateway
-                    │
-                    │
-          ┌─────────┴─────────┐
-          │                   │
-       default             profiles
-       stopped             stopped
-```
-
-Para forçarmos a reativação dos gateway abra o terminal e execute o comando para cada profile ou execute o script:
-
-#### ⟹ Para sistemas operacionais Windows utilize:
-
-1. Executando por comando para cada profile.
-
-    ```bash
-    hermes -p <profile_name> gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
-    sleep 8
-    hermes gateway list
-    ```
-
-2. Executando por Script -> [wakeup-gateway_win.sh](./telegram/scripts/wakeuo-gateway_win.sh)
-3. E para ver as portas que cada Gateway esta rodando utilize o comando `hermes gateway list`
-
-    ![statusgateway](./telegram/img/status_profile3.png)
-
-#### ⟹ Para sistemas operacionais Linux utilize:
-
-1. Executando por comando para cada profile.
-
-    ```bash
-    setsid hermes -p <profile_name> gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
-    sleep 8
-    hermes gateway list
-    ```
-
-2. Executando por escript -> [wakeup-gateway_lin.sh](./telegram/scripts/wakeup-gateway_lin.sh)
-3. E para ver as portas que cada Gateway esta rodando utilize o comando `hermes gateway list`
+Agora temos que criar os profiles de cada agente dentro do Hermes com seu respectivo Telegram Bot_Token e com o User_ID das pessoas que vão interagir com os agentes, mas antes temos que entender a diferença entre o protoloco **gateway single-channel e multiplex**. Para uma aplicação de automação com conectores que vão ter API REQUEST o ideal é o protocolo **multiplex**, é justamente o nosso caso, pois estaremos utilizando a plataforma Telegram para fazer a interação com os nosso agentes.
+Vamos pausar um pouco aqui e seguir em outro documento, onde temos a explicação da diferença entre os protocolos e como implantar o protocolo gateway multiplex.
+⇒ Abra o arquivo [config_multiplex.md](config_gw_multiplex.md)
 
 > [!NOTE]
-    Se estiver rodando o Hermes Agent App localmente em um PC (não em uma VPS), neste caso não será necessário este procedimento, pois o App já vai subir os gateway automaticamente.
-    Caso algum profile não suba, consulte o log localizado no diretório do próprio profile que está em **`profiles/<profile_name>/logs/gateway.log`**
+> Como vamos trabalhar com vários profiles o ideal é utilizar um gateway multiplex, pois desta forma facilita o gerenciamento do gateway, já que os profiles ficam legado a apenas um PID, ou seja compartilham do mesmo gateway.
+> Para fazer isso temos que migrar o tipo de gateway padrão single para o padrão multiplex através do comando:
+> `hermes gateway migrate --multiplex 2>&1`
+> Para mais informação consulte a documentação
 
 ---
 
@@ -357,8 +283,8 @@ Caso o agente não esteja retornando ou mesmo alguma mensagem de erro, verifique
 
 * Se você estiver no Hermes Desktop, carregue o app e entre em config para verificar se o provider e o modelo estão funcinando e disponível
 * Se necessário reinicie o gateway que pode ser pelo app ou através do terminal (lembrando que o terminal não poderá ser fechado).
-    - No App clique em **Gateway** (1) no rodapé canto esquerdo
-    - Depois clique no botão **Restart Gateway** (2)
+    * No App clique em **Gateway** (1) no rodapé canto esquerdo
+    * Depois clique no botão **Restart Gateway** (2)
 
     ![gateway1](./telegram/img/gateway1.png)
 
