@@ -1,22 +1,16 @@
 # Configuração do Gateway Hermes Agent — Padrão Multiplex
 
-> Guia passo a passo para configuração do zero com perfil default + um profile adicional,
-> registrando no Windows Scheduled Task/Startup e migrando para o padrão multiplex.
-
----
-
 ## Visão Geral
 
 O **gateway** é o processo que mantém conexão com as plataformas de mensageria (Telegram, Slack, Discord, etc.) e recebe/envia mensagens. A partir da versão que introduziu o **multiplex**, um único gateway host pode servir múltiplos perfis ao invés de cada profile ter seu próprio gateway rodando isoladamente.
 
 **Vantagens do multiplex:**
+
 - Um único processo Python para todos os perfis (menos RAM/CPU)
 - Um único pollador Telegram com o token (evita ban por múltiplas conexões)
 - Sem conflito de portas do API server
 - Um único ponto de reinício (`hermes gateway restart`)
 - Perfis novos são descobertos automaticamente (rescans a cada 30s)
-
----
 
 ## Cenário do Guia
 
@@ -24,102 +18,35 @@ Vamos configurar:
 
 | Step | Ação | Perfil(s) envolvido(s) |
 |---|---|---|
-| 1 | Instalar Hermes (já instalado — pular) | — |
+| 1 | Instalar Hermes (já instalado) | — |
 | 2 | Criar config.yaml da raiz (default) | `default` |
-| 3 | Criar um profile adicional (ex: `meu-novo-profile`) | `meu-novo-profile` |
-| 4 | Configurar Telegram em ambos os perfis (opcional) | ambos |
-| 5 | Registar o gateway default no Windows (Scheduled Task ou Startup) | `default` |
+| 3 | Criar um ou multiplo profiles | `meu-novo-profile` |
+| 4 | Configurar Telegram nos perfis de interação | pode ser só no `meu-novo-profile` ou em todos |
+| 5 | Registar o gateway default no Windows (Scheduled Task ou Startup) | somente para o `default` |
 | 6 | Iniciar o gateway | `default` |
 | 7 | Migrar para multiplex | todos |
 | 8 | Verificar status | todos |
 
 ---
 
-## 1. Pré-requisitos
+## Step 1. Verificar o config.yaml do perfil default
 
-- Hermes Agent instalado (via installer ou manual)
-- Acesso ao terminal com o `hermes` no PATH
-- Se for usar Telegram: bot token do @BotFather e chat_id do grupo/DM
-
----
-
-## 2. Criar/Verificar o config.yaml do perfil default
-
-O perfil default usa a raiz do hermes home (`$HOME/AppData/Local/hermes` no Windows).
+Considerando que o profile default já tenha sido criado no durante a instalação do Hermes, podemos encontrar o perfil default na pasta raiz do Hermes (`$HOME/AppData/Local/hermes` no Windows).
+Para acessar esta pasta utilize a tecla Win+R -> abre a janela executar
+Escreva o comando na linha "Abrir" em confirme com "Enter"
 
 ```bash
-# Verificar se existe
-type %LOCALAPPDATA%\hermes\config.yaml
+%LOCALAPPDATA%\hermes
 ```
 
-Se não existir, criá-lo com o mínimo essencial:
+Procure o arquivo **`config.yaml`** e abra em um editor de código.
+O arquivo terá algo como:
 
 ```yaml
-# %LOCALAPPDATA%\hermes\config.yaml
 model:
-  default: upstage/solar-pro4:free
+   default: upstage/solar-pro4:free
   provider: nous
   base_url: https://inference-api.nousresearch.com/v1
-database:
-  journal_mode: wal
-runtime:
-  nofile_soft_limit: 4096
-agent:
-  max_turns: 500
-  fast_auto_seconds: 60
-  verbose: false
-  reasoning_effort: medium
-terminal:
-  backend: local
-  cwd: C:\Users\Charles\Documents\Codando\Hermes
-  timeout: 180
-  home_mode: auto
-  lifetime_seconds: 300
-display:
-  skin: default
-  streaming: true
-timezone: America/Sao_Paulo
-_config_version: 46
-```
-
-> **Nota:** O config.yaml da raiz não precisa ter `platforms:` se você vai usar o multiplex — os profiles individuais têm suas próprias seções `platforms:`.
-
-### Arquivo .env da raiz (opcional)
-
-```bash
-# %LOCALAPPDATA%\hermes\.env
-OPENROUTER_API_KEY=sk-or-...
-# outras chaves globais se necessário
-```
-
----
-
-## 3. Criar o profile adicional
-
-```bash
-# Criar o profile (substituir "meu-novo-profile" pelo nome desejado)
-hermes profile create meu-novo-profile
-```
-
-Isso cria a estrutura:
-
-```
-%LOCALAPPDATA%\hermes\profiles\meu-novo-profile\
-├── config.yaml          # configurações específicas do profile
-├── .env                # credenciais/chaves do profile
-├── auth.json           # autenticações
-└── ...
-```
-
-### Configurar o config.yaml do profile
-
-Edite `%LOCALAPPDATA%\hermes\profiles\meu-novo-profile\config.yaml`:
-
-```yaml
-model:
-  default: poolside/laguna-s-2.1:free
-  provider: openrouter
-  base_url: https://openrouter.ai/api/v1
   api_mode: chat_completions
 database:
   journal_mode: wal
@@ -132,7 +59,7 @@ agent:
   reasoning_effort: medium
 terminal:
   backend: local
-  cwd: C:\Users\Charles\Documents\MeuProjeto
+  cwd: C:\Users\
   timeout: 180
   home_mode: auto
   lifetime_seconds: 300
@@ -142,23 +69,31 @@ display:
   streaming: true
 timezone: America/Sao_Paulo
 _config_version: 46
+... <continua>
 ```
 
-### Configurar o .env do profile
+## Step 2. Criar o profile adicional
 
-```bash
-# %LOCALAPPDATA%\hermes\profiles\meu-novo-profile\.env
-OPENROUTER_API_KEY=sk-or-...
-# outras chaves específicas do profile
+Caso você não tenha criado um novo profile, siga as instruções em: [config_newprofile.md](config_newprofile.md), depois retorne para este documento.
+
+Após a criação teremos uma estrutura:
+
+```text
+%LOCALAPPDATA%\hermes\profiles\meu-novo-profile\
+├── config.yaml          # configurações específicas do profile
+├── .env                # credenciais/chaves do profile
+├── auth.json           # autenticações
+└── ...
 ```
 
----
+## Step 3. Configurar o Telegram no config.yaml do profile
 
-## 4. Configurar Telegram nos perfis (opcional)
+Como estamos utilizando o Telegram em algum dos perfis, temos que certificar que temos o bloco `platforms:` presente no config.yaml do **profile** (não na raiz) e deve conter a instrução para `home_channel` com `chat_id`.
+Abra o arquivo **config.yaml** do profile em um editor de código (IDE), o arquivo se localisa em:</br>
 
-Se for usar Telegram em algum dos perfis, o bloco `platforms:` deve estar presente no config.yaml do **profile** (não na raiz) e deve conter `home_channel` com `chat_id`.
+Edite `%LOCALAPPDATA%\hermes\profiles\meu-novo-profile\config.yaml`:
 
-### No config.yaml do profile (ex: `pesquisador-vet/config.yaml`):
+Caso o bloco `platforms:` não esteja presente, escreva ao final do arquivo.
 
 ```yaml
 # ... outras configurações ...
@@ -168,32 +103,25 @@ platforms:
     enabled: true
     home_channel:
       platform: telegram
-      chat_id: "758543036"
-```
-
-### No .env do profile:
-
-```bash
-# %LOCALAPPDATA%\hermes\profiles\meu-novo-profile\.env
-TELEGRAM_BOT_TOKEN=8991670939:YOUR_TOKEN_HERE
-TELEGRAM_ALLOWED_USERS=758543036
-TELEGRAM_HOME_CHANNEL=758543036
-TELEGRAM_HOME_CHANNEL_NAME=NomeDoBot
+      chat_id: "xxxxxxxxx"
 ```
 
 > **⚠️ Importante:** Um `home_channel` incompleto (com apenas `platform:` e sem `chat_id`) causa `KeyError: 'chat_id'` e impede o gateway de iniciar. Ou o bloco está completo, ou não está presente (se Telegram não for usar).
 
----
-
-## 5. Registar o Gateway no Windows (Scheduled Task / Startup)
+## Step 4. Registar o Gateway no Windows (Scheduled Task / Startup)
 
 Antes da migração para multiplex, o gateway do perfil default precisa ser registrado para iniciar automaticamente no login do Windows.
 
 ### Opção A — Instalar via comando Hermes (recomendado)
 
+Abra o terminal bash (ou outro de sua preferencia como PowerShell) e navegue até a pasta raiz do Hermes
+
 ```bash
-# No PowerShell ou CMD, na raiz do hermes home:
-cd %LOCALAPPDATA%\hermes
+# No terminal Bash:
+cd $HOME/AppData/Local/hermes
+
+# No PowerShell ou CMD:
+cd $env:LOCALAPPDATA
 
 # Instalar o gateway como serviço Windows (requer elevação/admin se usar Scheduled Task)
 hermes gateway install
@@ -203,25 +131,26 @@ hermes gateway restart
 ```
 
 O comando `hermes gateway install` cria:
+
 - **Scheduled Task**: `Hermes_Gateway` na pasta de tarefas do Windows
 - **ou** um atalho na pasta Startup:  
   `C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\Hermes_Gateway.vbs`
 
-Se o comando detetar que UAC está bloqueando o Scheduled Task, ele recorre automaticamente ao Startup folder.
+Se o comando detetar que UAC (User Account Control_Segurança de Computador) está bloqueando o Scheduled Task, ele recorre automaticamente ao Startup folder.
 
 ### Opção B — Registar manualmente no Startup folder
 
 Criar um arquivo `Hermes_Gateway.vbs` na pasta:
 
 ```
-C:\Users\Charles\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\
+C:\Users\<user>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\
 ```
 
 Com conteúdo:
 
 ```vbscript
 Set WshShell = CreateObject("WScript.Shell")
-WshShell.Run "cmd.exe /c C:\Users\Charles\AppData\Local\hermes\bin\hermes gateway run", 0, False
+WshShell.Run "cmd.exe /c C:\Users\<user>\AppData\Local\hermes\bin\hermes gateway run", 0, False
 ```
 
 > Isso inicia o gateway em background quando o Windows faz login.
@@ -238,7 +167,7 @@ dir "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Hermes_Gateway*"
 
 ---
 
-## 6. Iniciar o Gateway
+## Step 5. Iniciar o Gateway
 
 ```bash
 cd %LOCALAPPDATA%\hermes
@@ -254,7 +183,7 @@ Saída esperada:
 
 ---
 
-## 7. Migrar para o Padrão Multiplex
+## Step 6. Migrar para o Padrão Multiplex
 
 Com todos os profiles configurados (com ou sem Telegram), executar a migração:
 
@@ -265,13 +194,13 @@ hermes gateway migrate --multiplex
 
 O comando mostra o plano e pede confirmação:
 
-```
+```bash
 Migration plan
-  default home: C:\Users\Charles\AppData\Local\hermes
+  default home: C:\Users\<user>\AppData\Local\hermes
 
   profile          gateway pid   service
   default          <pid>          Windows scheduled task
-  pesquisador-vet  -              none
+  meu-novo-profile -              none
   meu-novo-profile -              none
   ...
 
@@ -285,9 +214,10 @@ Steps:
 Apply this migration now? [Y/n]:
 ```
 
-Confirmar com `y` (ou Enter).
+Confirmar com **`y`** (ou Enter).
 
 > **O que o migration faz:**
+
 > 1. Para os gateways individuais dos profiles que os tinham
 > 2. Desinstala as tarefas agendadas por-profile
 > 3. Adiciona `gateway.multiplex_profiles: true` ao config.yaml da raiz
@@ -307,9 +237,7 @@ gateway:
   # etc.
 ```
 
----
-
-## 8. Verificar o Status
+## Step 7. Verificar o Status
 
 ```bash
 hermes gateway list
@@ -317,11 +245,11 @@ hermes gateway list
 
 Saída esperada com multiplex ativo:
 
-```
+```bash
 Gateways:
   ✓ default (current)        — PID <número>
-  ✓ pesquisador-vet          — served by the default multiplexer
-  ✓ time-comercial           — served by the default multiplexer
+  ✓ meu-novo-profile         — served by the default multiplexer
+  ✓ meu-novo-profile         — served by the default multiplexer
   ✓ meu-novo-profile         — served by the default multiplexer
   ...
 ```
@@ -330,7 +258,7 @@ Todos os profiles mostram `served by the default multiplexer`.
 
 ---
 
-## 9. Para Criar Novos Profiles no Futuro
+## Para Criar Novos Profiles no Futuro
 
 Com o multiplex já ativo, o fluxo simplifica:
 
@@ -350,13 +278,14 @@ hermes gateway rescan-profiles
 ```
 
 **Não é necessário:**
+
 - Registrar Scheduled Task ou Startup para cada profile
 - Rodar `hermes -p <profile> gateway install/restart`
 - Preocupar-se com conflito de portas ou tokens
 
 ---
 
-## 10. Troubleshooting
+## Troubleshooting
 
 ### Gateway não sobe / crash na inicialização
 

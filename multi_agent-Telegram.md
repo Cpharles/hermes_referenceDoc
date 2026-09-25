@@ -136,10 +136,12 @@ Temos dois caminhos para acordar os bots:
 
 ### Step 1. Criando Profiles Hermes
 
-Quando fazemos a instalação do Hermes Agent obrigatoriamente temos que configurar um **profile default** que é uma exigência do Hermes seguindo o passo a passo fornecido pelo instalador que fará algumas perguntas para confirmações e fornecer algumas informações. Caso vc já tenha instalado e tenha vários profiles, não é necessário desistalar, apenas escolha qual dos profiles e de preferencia o promeiro que foi criado para ser setado como agente default.
+Quando fazemos a instalação do Hermes Agent obrigatoriamente temos que configurar um **profile default** que é a primeira solicitação do Hermes. Seguindo o passo a passo fornecido pelo instalador, vamos receber algumas perguntas de confirmações e fornecer algumas informações.
+Caso vc já tenha instalado e tenha vários profiles, não é necessário desistalar, apenas escolha qual dos profiles e de preferencia o primeiro que foi criado para ser **setado como agente default**. E porque dissso?; Simplesmente poque o primeiro profile criado que é chamado de default cria toda a sua estrutura de pastas na raiz do Hermes, e consequentemente este profile poderá ser utilizado como base para (clonado) criação de outros profiles.</br>
 Para saber a insformação do seu profile default vamos executar:
 
-1. Abra o terminal **Git Bash** ou o terminal CLI local do seu VPS na seção do Hermes (para acessa-lo é necessário ter o [Git instalado](https://git-scm.com/install/windows))
+1. Abra o terminal **Git Bash** (obs. 1) ou o terminal CLI local do seu VPS na seção do Hermes.
+    (obs. 1) - para acessar o terminal Git Bash é necessário ter o [Git instalado](https://git-scm.com/install/windows).
 2. Execute o seguinte comando no terminal:
 
     ```bash
@@ -149,6 +151,7 @@ Para saber a insformação do seu profile default vamos executar:
     Podemos verificar que temos inicialmente somente o profile padrão que é chamado de **default**. Este profile é criado na primeira vez que você instala o Hermes Agent.
 
     ![status1](./telegram/img/status_profile1.png)
+    </br>
 
     Nosso objetivo é no final da configuração dos profiles termos uma estrutura:
 
@@ -162,13 +165,13 @@ Para saber a insformação do seu profile default vamos executar:
           GLOBAL          profiles/
             │                │
             │                ├───────────────────────────┬────────────┬...
-         Profile          Agente1/                    Agente2/
+         default          Agente1/                    Agente2/
             │                │                           │
           .env             .env                        .env
        config.yaml      config.yaml                 config.yaml
          SOUL.md          SOUL.md                     SOUL.md
             │                 │                           │
-            │        Telegram + OpenRouter       Telegram + OpenRouter
+            │              Telegram                    Telegram
             │                 │                           │
             ▼                 ▼                           ▼
         gateway run       gateway run                 gateway run
@@ -177,15 +180,18 @@ Para saber a insformação do seu profile default vamos executar:
           running          running                     running
     ```
 
-Agora temos que criar os profiles de cada agente dentro do Hermes com seu respectivo Telegram Bot_Token e com o User_ID das pessoas que vão interagir com os agentes, mas antes temos que entender a diferença entre o protoloco **gateway single-channel e multiplex**. Para uma aplicação de automação com conectores que vão ter API REQUEST o ideal é o protocolo **multiplex**, é justamente o nosso caso, pois estaremos utilizando a plataforma Telegram para fazer a interação com os nosso agentes.
-Vamos pausar um pouco aqui e seguir em outro documento, onde temos a explicação da diferença entre os protocolos e como implantar o protocolo gateway multiplex.
-⇒ Abra o arquivo [config_multiplex.md](config_gw_multiplex.md)
+### Step 2. Definindo o tipo de protocolo do gateway
 
-> [!NOTE]
-> Como vamos trabalhar com vários profiles o ideal é utilizar um gateway multiplex, pois desta forma facilita o gerenciamento do gateway, já que os profiles ficam legado a apenas um PID, ou seja compartilham do mesmo gateway.
-> Para fazer isso temos que migrar o tipo de gateway padrão single para o padrão multiplex através do comando:
-> `hermes gateway migrate --multiplex 2>&1`
-> Para mais informação consulte a documentação
+Antes de criarmos os profiles de cada agente dentro do Hermes, temos que entender a diferença entre o protoloco **gateway single-channel e multiplex**.
+Para uma aplicação de automação com conectores (chamado também de **Plataformas**) que tem ação externa e portanto vão ter request via API, o **gateway com protocolo single channel** atende perfeitamente quando temos apenas um agente interagindo (fazendo request) com a plataforma, mas quando vamos trabalhar com multiplos agentes e estes agentes também vão fazer request para o mesma plataforma, neste caso o ideal é o **gateway com > protocolo multiplex**.
+É justamente o nosso caso, pois estaremos utilizando a plataforma Telegram para fazer a interação com multiplos agentes.
+Vamos pausar um pouco aqui e seguir em outro documento, onde temos a explicação da diferença entre os protocolos e como implantar o protocolo **gateway multiplex**.
+
+⇒ ⇒ Abra o arquivo [config_multiplex.md](config_gw_multiplex.md)</br>
+
+Caso a sua aplicação tenha apenas um **único agente** interagindo com a plataforma, o recomendado é utilizar o **gateway single-channel protocol**, neste caso siga as instruções em:
+
+⇒ ⇒ Abra o arquivo [config_newprofile.md](config_newprofile.md)
 
 ---
 
