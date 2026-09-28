@@ -183,15 +183,15 @@ Para saber a insformação do seu profile default vamos executar:
 ### Step 2. Definindo o tipo de protocolo do gateway
 
 Antes de criarmos os profiles de cada agente dentro do Hermes, temos que entender a diferença entre o protoloco **gateway single-channel e multiplex**.
-Para uma aplicação de automação com conectores (chamado também de **Plataformas**) que tem ação externa e portanto vão ter request via API, o **gateway com protocolo single channel** atende perfeitamente quando temos apenas um agente interagindo (fazendo request) com a plataforma, mas quando vamos trabalhar com multiplos agentes e estes agentes também vão fazer request para o mesma plataforma, neste caso o ideal é o **gateway com > protocolo multiplex**.
+Para uma aplicação de automação com conectores (chamado também de **Plataformas**) que tem ação externa e portanto vão ter request via API, o **gateway com protocolo single channel** atende perfeitamente quando temos apenas um agente interagindo (fazendo request) com a plataforma, mas quando vamos trabalhar com multiplos agentes, e estes agentes também vão fazer request para a mesma plataforma, neste caso o ideal é utilizar o **gateway com protocolo multiplex**.
 É justamente o nosso caso, pois estaremos utilizando a plataforma Telegram para fazer a interação com multiplos agentes.
-Vamos pausar um pouco aqui e seguir em outro documento, onde temos a explicação da diferença entre os protocolos e como implantar o protocolo **gateway multiplex**.
+Vamos pausar um pouco aqui e seguir em outro documento, onde temos a explicação da diferença entre os protocolos e como implantar **gateway multiplexado**.
 
-⇒ ⇒ Abra o arquivo [config_multiplex.md](config_gw_multiplex.md)</br>
+:books: ⇒ Abra o arquivo [config_multiplex.md](config_gw_multiplex.md)</br>
 
 Caso a sua aplicação tenha apenas um **único agente** interagindo com a plataforma, o recomendado é utilizar o **gateway single-channel protocol**, neste caso siga as instruções em:
 
-⇒ ⇒ Abra o arquivo [config_newprofile.md](config_newprofile.md)
+:books: ⇒ Abra o arquivo [config_newprofile.md](config_newprofile.md)
 
 ---
 

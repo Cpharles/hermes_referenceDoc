@@ -18,22 +18,24 @@ Vamos configurar:
 
 | Step | Ação | Perfil(s) envolvido(s) |
 |---|---|---|
-| 1 | Instalar Hermes (já instalado) | — |
-| 2 | Criar config.yaml da raiz (default) | `default` |
-| 3 | Criar um ou multiplo profiles | `meu-novo-profile` |
-| 4 | Configurar Telegram nos perfis de interação | pode ser só no `meu-novo-profile` ou em todos |
-| 5 | Registar o gateway default no Windows (Scheduled Task ou Startup) | somente para o `default` |
-| 6 | Iniciar o gateway | `default` |
-| 7 | Migrar para multiplex | todos |
-| 8 | Verificar status | todos |
+| - | Instalar Hermes (já instalado) | — |
+| 1 | Criar config.yaml da raiz (default) | `default` |
+| 2 | Criar um ou multiplo profiles | `meu-novo-profile` |
+| 3 | Configurar Telegram nos perfis de interação | pode ser só no `meu-novo-profile` ou em todos |
+| 4 | Registar o gateway default no Windows (Scheduled Task ou Startup) | somente para o `default` |
+| 5 | Iniciar o gateway | `default` |
+| 6 | Migrar para multiplex | todos |
+| 7 | Verificar status | todos |
 
 ---
 
 ## Step 1. Verificar o config.yaml do perfil default
 
-Considerando que o profile default já tenha sido criado no durante a instalação do Hermes, podemos encontrar o perfil default na pasta raiz do Hermes (`$HOME/AppData/Local/hermes` no Windows).
-Para acessar esta pasta utilize a tecla Win+R -> abre a janela executar
-Escreva o comando na linha "Abrir" em confirme com "Enter"
+Considerando que o profile default já tenha sido criado durante a instalação do Hermes, podemos encontrar o perfil default na pasta raiz do Hermes em (`$HOME/AppData/Local/hermes` no Windows).
+Para acessar esta pasta:
+
+1. utilize a tecla Win+R -> abre a janela executar.
+2. Escreva o comando na linha "Abrir" em confirme com "Enter"
 
 ```bash
 %LOCALAPPDATA%\hermes
@@ -59,7 +61,7 @@ agent:
   reasoning_effort: medium
 terminal:
   backend: local
-  cwd: C:\Users\
+  cwd: C:\Users\<user>
   timeout: 180
   home_mode: auto
   lifetime_seconds: 300
@@ -80,7 +82,7 @@ Após a criação teremos uma estrutura:
 
 ```text
 %LOCALAPPDATA%\hermes\profiles\meu-novo-profile\
-├── config.yaml          # configurações específicas do profile
+├── config.yaml         # configurações específicas do profile
 ├── .env                # credenciais/chaves do profile
 ├── auth.json           # autenticações
 └── ...

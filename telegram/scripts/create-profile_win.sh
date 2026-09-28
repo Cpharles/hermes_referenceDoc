@@ -2,30 +2,61 @@
 
 # ============================================================
 # Hermes Agent - Criar e configurar Profile
-# Ambiente: Windows + Git Bash
+# Ambiente: Windows 10 + Git Bash (sem WSL, sem yq)
 # ============================================================
 
-set -u
+set -uo pipefail
+
+# ============================================================
+# 0. COMO UTILIZAR O SCRIPT
+# ============================================================
+# Abra o terminal de sua preferência (Git Bash, PowerShell, CMD) e navegue até o diretório onde está o script. 
+# MANDATÓRIO: Antes de executar o script rode o comando para carregar o TOKEN no buffer do shell:  export TELEGRAM_BOT_TOKEN="<token>"
+# Exemplo de execução:
+#   export TELEGRAM_BOT_TOKEN="123456:ABCDEF"
+#   bash create-profile_win.sh
+
 
 # ============================================================
 # 1. CONFIGURAÇÃO DO NOVO PROFILE
 # ============================================================
 
-MEU_ID="<TELEGRAM_ALLOWED_USERS>"            # User ID -> TELEGRAM_ALLOWED_USERS, TELEGRAM_HOME_CHANNEL
-CHANNEL_NAME="<BOT_NAME>"                    # Bot name -> TELEGRAM_HOME_CHANNEL_NAME
-PROFILE_NAME="<YOUR_PROFILE_NAME>"           # Profile name
-BOT_TOKEN="<YOUR_TELEGRAM_BOT_TOKEN>"        # TELEGRAM_BOT_TOKEN
+# ALTERAR SOMENTE ESTAS VARIÁVEIS PARA CRIAR UM NOVO PROFILE:
+# ↧------------------------------↧
+PROFILE_NAME_RAW="Redator_DocVet"       # Nome do profile
+CHANNEL_NAME="Revisor_DocVet"           # Nome amigável do bot (TELEGRAM_HOME_CHANNEL_NAME)
+USER_ID="758543036"                     # User ID do Telegram (DM) — pode adicionar vários separando por ,
+DIRETORIO_HERMES="<local_do_hermes>"    # Caminho onde está o diretório do Hermes (geralmente em $HOME/AppData/Local/hermes para Windows)
+# ↥------------------------------↥
+
+
+# ⚠ NÃO coloque o token no script.
+BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-}"     # Token do bot do Telegram (TELEGRAM_BOT_TOKEN)
+PLATFORM="telegram"                     # Plataforma alvo
+HOME_CHANNEL_ID="$USER_ID"              # Chat ID para HOME_CHANNEL (normalmente = USER_ID em DM)
+CLONE_FROM="${CLONE_FROM:-default}"     # Profile base para clonar
+
+# -------- Normalização: PROFILE_NAME sempre em minúsculo --------
+PROFILE_NAME="$(printf '%s' "$PROFILE_NAME_RAW" | tr '[:upper:]' '[:lower:]')"
+
+# Valida caracteres permitidos (letras, números, _ e -)
+if [[ ! "$PROFILE_NAME" =~ ^[a-z0-9_-]+$ ]]; then
+    echo
+    echo "❌ ERRO: PROFILE_NAME contém caracteres inválidos: '$PROFILE_NAME'" >&2
+    echo "   Permitido: letras minúsculas, números, '_' e '-'." >&2
+    exit 1
+fi
+# ----------------------------------------------------------------
 
 # ============================================================
 # 2. CAMINHOS
 # ============================================================
 
-HERMES_HOME="$HOME/AppData/Local/hermes"
-GLOBAL_ENV="$HERMES_HOME/.env"
+HERMES_HOME="$DIRETORIO_HERMES"
 PROFILE_DIR="$HERMES_HOME/profiles/$PROFILE_NAME"
 ENV_FILE="$PROFILE_DIR/.env"
-LOG_FILE="/tmp/$PROFILE_NAME-gateway.log"
-
+CONFIG_FILE="$PROFILE_DIR/config.yaml"
+SOUL_FILE="$PROFILE_DIR/soul.md"
 
 # ============================================================
 # 3. FUNÇÕES AUXILIARES
@@ -33,7 +64,7 @@ LOG_FILE="/tmp/$PROFILE_NAME-gateway.log"
 
 erro() {
     echo
-    echo "❌ ERRO: $1"
+    echo "❌ ERRO: $1" >&2
     exit 1
 }
 
@@ -41,280 +72,291 @@ ok() {
     echo "✓ $1"
 }
 
+aviso() {
+    echo "⚠ $1"
+}
+
+backup_file() {
+    local f="$1"
+    [[ -f "$f" ]] || return 0
+    local stamp
+    stamp="$(date +%Y%m%d_%H%M%S)"
+    cp -n "$f" "${f}.bak.${stamp}" 2>/dev/null || true
+}
+
+normalize_lf() {
+    local f="$1"
+    [[ -f "$f" ]] || return 0
+    if grep -q $'\r' "$f" 2>/dev/null; then
+        sed -i 's/\r$//' "$f"
+    fi
+}
 
 # ============================================================
-# 4. VALIDAR CONFIGURAÇÕES
+# 4. VALIDAÇÕES INICIAIS
 # ============================================================
-
 echo
 echo "============================================================"
 echo " Hermes Agent - Criação de Profile"
 echo "============================================================"
 echo
-
 echo "Profile: $PROFILE_NAME"
 echo
 
-[[ -n "$PROFILE_NAME" ]] || erro "NOME não foi definido."
-[[ -n "$CHANNEL_NAME" ]] || erro "CHANNEL_NAME não foi definido."
-[[ -n "$MEU_ID" ]] || erro "MEU_ID não foi definido."
-[[ -n "$BOT_TOKEN" ]] || erro "TOKEN não foi definido."
+command -v hermes >/dev/null 2>&1 || erro "'hermes' não encontrado no PATH."
+
+[[ -n "$PROFILE_NAME"    ]] || erro "PROFILE_NAME não foi definido."
+[[ -n "$CHANNEL_NAME"    ]] || erro "CHANNEL_NAME não foi definido."
+[[ -n "$USER_ID"         ]] || erro "USER_ID não foi definido."
+[[ -n "$HOME_CHANNEL_ID" ]] || erro "HOME_CHANNEL_ID não foi definido."
+[[ -n "$PLATFORM"        ]] || erro "PLATFORM não foi definido."
+[[ -n "$BOT_TOKEN"       ]] || erro "BOT_TOKEN não definido. Exporte TELEGRAM_BOT_TOKEN antes de rodar."
 
 ok "Variáveis básicas encontradas."
+ok "Comando 'hermes' disponível."
 
 # ============================================================
-# 6. VALIDAR .ENV GLOBAL
-# ============================================================
-
-if [[ ! -f "$GLOBAL_ENV" ]]; then
-    erro "Arquivo global do Hermes não encontrado:
-
-$GLOBAL_ENV"
-fi
-
-ok "Arquivo global do Hermes encontrado."
-
-
-# ============================================================
-# 7. OBTER OPENROUTER_API_KEY DO .ENV GLOBAL
-# ============================================================
-
-OPENROUTER_API_KEY=$(
-    grep '^OPENROUTER_API_KEY=' "$GLOBAL_ENV" \
-    | head -1 \
-    | cut -d= -f2-
-)
-
-if [[ -z "$OPENROUTER_API_KEY" ]]; then
-    erro "OPENROUTER_API_KEY não encontrada em:
-
-$GLOBAL_ENV"
-fi
-
-ok "OPENROUTER_API_KEY encontrada no .env global."
-
-
-# ============================================================
-# 8. VERIFICAR SE O PROFILE JÁ EXISTE
+# 5. VERIFICAR SE O PROFILE JÁ EXISTE
 # ============================================================
 
 if [[ -d "$PROFILE_DIR" ]]; then
-
     echo
-    echo "⚠ O profile '$PROFILE_NAME' já existe:"
-    echo "$PROFILE_DIR"
+    aviso "O profile '$PROFILE_NAME' já existe:"
+    echo "    $PROFILE_DIR"
     echo
-
     echo "Para evitar sobrescrever configurações existentes,"
     echo "o script será encerrado."
-
     echo
-    echo "Se deseja recriá-lo é necessário apagalo antes, execute o comando:"
+    echo "Se deseja recriá-lo, apague antes com:"
     echo
     echo "    hermes profile delete $PROFILE_NAME"
     echo
-    echo "Ou altere o nome do profile na variável NOME no início do script."
-    echo "Em seguida, execute novamente este script."
-
+    echo "Ou escolha outro nome em PROFILE_NAME_RAW no início do script."
     exit 1
 fi
 
-
 # ============================================================
-# 9. CRIAR PROFILE
+# 6. CRIAR PROFILE
 # ============================================================
-
 echo
-echo "→ Criando profile: '$PROFILE_NAME'..."
+echo "→ Criando profile: '$PROFILE_NAME' (clone de '$CLONE_FROM')..."
 
-if ! hermes profile create "$PROFILE_NAME" --clone-from default; then
+if ! hermes profile create "$PROFILE_NAME" --clone-from "$CLONE_FROM"; then
     erro "Falha ao criar o profile."
 fi
 
 ok "Profile criado."
 
-
 # ============================================================
-# 10. VALIDAR .ENV DO PROFILE
+# 7. VALIDAR PRINCIPAIS ARQUIVOS DO PROFILE
 # ============================================================
 
-if [[ ! -f "$ENV_FILE" ]]; then
-    erro "O .env do novo profile não foi encontrado:
-
+[[ -f "$ENV_FILE"    ]] || erro "Arquivo .env não encontrado:
 $ENV_FILE"
+ok "Arquivo .env encontrado."
+
+[[ -f "$CONFIG_FILE" ]] || erro "Arquivo config.yaml não encontrado:
+$CONFIG_FILE"
+ok "Arquivo config.yaml encontrado."
+
+[[ -f "$SOUL_FILE"   ]] || erro "Arquivo soul.md não encontrado:
+$SOUL_FILE"
+ok "Arquivo soul.md encontrado."
+
+normalize_lf "$ENV_FILE"
+normalize_lf "$CONFIG_FILE"
+
+backup_file "$ENV_FILE"
+backup_file "$CONFIG_FILE"
+ok "Backups criados (se aplicável)."
+
+# ============================================================
+# 8. REGISTRAR DADOS DO TELEGRAM
+# ============================================================
+echo
+echo "→ Configurando parâmetros do Telegram..."
+
+# -------- 8a. .env --------
+awk '
+    !/^TELEGRAM_(HOME_CHANNEL_NAME|ALLOWED_USERS|HOME_CHANNEL|BOT_TOKEN)=/
+' "$ENV_FILE" > "$ENV_FILE.tmp" && mv "$ENV_FILE.tmp" "$ENV_FILE"
+
+{
+    printf 'TELEGRAM_HOME_CHANNEL_NAME=%s\n' "$CHANNEL_NAME"
+    printf 'TELEGRAM_ALLOWED_USERS=%s\n'     "$USER_ID"
+    printf 'TELEGRAM_HOME_CHANNEL=%s\n'      "$HOME_CHANNEL_ID"
+    printf 'TELEGRAM_BOT_TOKEN=%s\n'         "$BOT_TOKEN"
+} >> "$ENV_FILE"
+
+ok "Variáveis do Telegram gravadas em .env."
+
+# -------- 8b. config.yaml --------
+# Se não encontrado o bloco 'platforms.telegram', adciona ao final do arquivo
+if ! grep -q '^platforms:' "$CONFIG_FILE"; then
+    cat <<EOL >> "$CONFIG_FILE"
+platforms:
+  telegram:
+    enabled: true
+    home_channel:
+      platform: telegram
+      chat_id: "$HOME_CHANNEL_ID"
+EOL
+    ok "Seção 'platforms.telegram' adicionada ao config.yaml."
+
+# Se encontrado 'platforms:' mas não 'telegram:', adiciona subseção 'telegram' dentro de 'platforms'
+elif ! grep -q '^[[:space:]]\{2,\}telegram:[[:space:]]*$' "$CONFIG_FILE"; then
+    awk -v id="$HOME_CHANNEL_ID" '
+        BEGIN { inserted = 0 }
+        {
+            print
+            if (!inserted && $0 ~ /^platforms:[[:space:]]*$/) {
+                print "  telegram:"
+                print "    enabled: true"
+                print "    home_channel:"
+                print "      platform: telegram"
+                print "      chat_id: \"" id "\""
+                inserted = 1
+            }
+        }
+    ' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    ok "Subseção 'telegram' inserida dentro de 'platforms'."
+
+# Se encontrado 'platforms.telegram', atualiza os valores de 'enabled' e 'chat_id'
+else
+    awk -v id="$HOME_CHANNEL_ID" '
+        BEGIN { in_platforms=0; in_telegram=0; tg_indent=0 }
+        /^platforms:[[:space:]]*$/ { in_platforms=1; print; next }
+
+        in_platforms && /^[^[:space:]]/ { in_platforms=0; in_telegram=0 }
+
+        in_platforms && match($0, /^[[:space:]]+telegram:[[:space:]]*$/) {
+            in_telegram=1
+            tg_indent = match($0, /[^ ]/) - 1
+            print; next
+        }
+
+        in_telegram {
+            cur_indent = match($0, /[^ ]/) - 1
+            if ($0 !~ /^[[:space:]]*$/ && cur_indent <= tg_indent && $0 ~ /^[[:space:]]*[A-Za-z0-9_]+:/) {
+                in_telegram=0
+            } else {
+                if ($0 ~ /^[[:space:]]*enabled:/) {
+                    sub(/enabled:[[:space:]]*.*/, "enabled: true")
+                }
+                if ($0 ~ /^[[:space:]]*chat_id:/) {
+                    sub(/chat_id:[[:space:]]*.*/, "chat_id: \"" id "\"")
+                }
+            }
+        }
+        { print }
+    ' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
+    ok "Configurações do 'telegram' atualizadas no config.yaml."
 fi
 
-ok "Arquivo .env do profile encontrado."
-
-
 # ============================================================
-# 11. CONFIGURAR API E TELEGRAM
+# 9. VALIDAR CONFIGURAÇÕES DO PROFILE
 # ============================================================
-
 echo
-echo "→ Configurando API OpenRouter e Telegram..."
+echo "→ Confirmando e validando a configuração do Telegram..."
 
+grep -q '^TELEGRAM_HOME_CHANNEL_NAME=' "$ENV_FILE" || erro "TELEGRAM_HOME_CHANNEL_NAME não configurada."
+grep -q '^TELEGRAM_ALLOWED_USERS='     "$ENV_FILE" || erro "TELEGRAM_ALLOWED_USERS não configurada."
+grep -q '^TELEGRAM_HOME_CHANNEL='      "$ENV_FILE" || erro "TELEGRAM_HOME_CHANNEL não configurada."
+grep -q '^TELEGRAM_BOT_TOKEN='         "$ENV_FILE" || erro "TELEGRAM_BOT_TOKEN não configurada."
 
-# Remover configurações anteriores destas variáveis.
-# O restante do .env permanece intacto.
-
-sed -i '/^OPENROUTER_API_KEY=/d' "$ENV_FILE"
-sed -i '/^TELEGRAM_HOME_CHANNEL_NAME=/d' "$ENV_FILE"
-sed -i '/^TELEGRAM_ALLOWED_USERS=/d' "$ENV_FILE"
-sed -i '/^TELEGRAM_HOME_CHANNEL=/d' "$ENV_FILE"
-sed -i '/^TELEGRAM_BOT_TOKEN=/d' "$ENV_FILE"
-
-
-# Adicionar configurações do novo profile.
-
-printf '%s\n' \
-    "OPENROUTER_API_KEY=$OPENROUTER_API_KEY" \
-    "TELEGRAM_HOME_CHANNEL_NAME=$CHANNEL_NAME" \
-    "TELEGRAM_ALLOWED_USERS=$MEU_ID" \
-    "TELEGRAM_HOME_CHANNEL=$MEU_ID" \
-    "TELEGRAM_BOT_TOKEN=$BOT_TOKEN" \
-    >> "$ENV_FILE"
-
-ok "Configurações adicionadas."
-
-
-# ============================================================
-# 12. VALIDAR CONFIGURAÇÕES DO PROFILE
-# ============================================================
-
-echo
-echo "→ Validando configuração..."
-
-grep -q '^OPENROUTER_API_KEY=' "$ENV_FILE" \
-    || erro "OPENROUTER_API_KEY não foi configurada."
-
-grep -q '^TELEGRAM_HOME_CHANNEL_NAME=' "$ENV_FILE" \
-    || erro "TELEGRAM_HOME_CHANNEL_NAME não foi configurada."
-
-grep -q '^TELEGRAM_ALLOWED_USERS=' "$ENV_FILE" \
-    || erro "TELEGRAM_ALLOWED_USERS não foi configurada."
-
-grep -q '^TELEGRAM_HOME_CHANNEL=' "$ENV_FILE" \
-    || erro "TELEGRAM_HOME_CHANNEL não foi configurada."
-
-grep -q '^TELEGRAM_BOT_TOKEN=' "$ENV_FILE" \
-    || erro "TELEGRAM_BOT_TOKEN não foi configurada."
+grep -q '^platforms:'                               "$CONFIG_FILE" || erro "Seção 'platforms' ausente no config.yaml."
+grep -q '^[[:space:]]\{2,\}telegram:[[:space:]]*$'  "$CONFIG_FILE" || erro "Seção 'telegram' ausente no config.yaml."
 
 ok "Configuração validada."
 
-
 # ============================================================
-# 13. MOSTRAR CONFIGURAÇÃO SEM EXPOR SECRETS
+# 10. RESUMO DA CONFIGURAÇÃO (SEM EXPOR TOKEN)
 # ============================================================
-
 echo
-echo "Configuração do profile:"
 echo "----------------------------------------"
-
-echo "Profile: $PROFILE_NAME"
-echo "ENV:     $ENV_FILE"
-
-grep '^OPENROUTER_API_KEY=' "$ENV_FILE" \
-    | sed 's/=.*/=***REDACTED***/'
-
+echo "Resumo da Configuração do profile:"
+echo "----------------------------------------"
+echo "Profile:       $PROFILE_NAME"
+echo ".env file:     $ENV_FILE"
+echo "config file:   $CONFIG_FILE"
+echo
+echo "Arquivo das variáveis --- .env ---"
 grep '^TELEGRAM_HOME_CHANNEL_NAME=' "$ENV_FILE"
+grep '^TELEGRAM_ALLOWED_USERS='     "$ENV_FILE"
+grep '^TELEGRAM_HOME_CHANNEL='      "$ENV_FILE"
+grep '^TELEGRAM_BOT_TOKEN='         "$ENV_FILE" \
+    | sed -E 's/(=[0-9]+:)[A-Za-z0-9_-]+/\1***REDACTED***/'
 
-grep '^TELEGRAM_ALLOWED_USERS=' "$ENV_FILE"
+extract_platform_block() {
+    local file="$1" platform="$2"
+    awk -v target="$platform" '
+        /^platforms:[[:space:]]*$/ { in_platforms = 1; next }
+        in_platforms && /^[^[:space:]]/ { in_platforms = 0 }
 
-grep '^TELEGRAM_HOME_CHANNEL=' "$ENV_FILE"
+        in_platforms && match($0, /^[[:space:]]+[A-Za-z0-9_]+:[[:space:]]*$/) {
+            line = $0
+            sub(/^[[:space:]]+/, "", line)
+            sub(/:.*$/, "", line)
+            if (line == target) {
+                found = 1
+                indent = match($0, /[^ ]/) - 1
+                print $0
+                next
+            }
+            if (found) {
+                cur_indent = match($0, /[^ ]/) - 1
+                if (cur_indent <= indent && $0 ~ /^[[:space:]]*[A-Za-z0-9_]+:/) exit
+            }
+        }
 
-grep '^TELEGRAM_BOT_TOKEN=' "$ENV_FILE" \
-    | sed 's/=.*/=***REDACTED***/'
+        found && !/^[[:space:]]*$/ {
+            cur_indent = match($0, /[^ ]/) - 1
+            if (cur_indent > indent) print $0
+            else if ($0 ~ /^[[:space:]]*[A-Za-z0-9_]+:/) exit
+        }
+    ' "$file"
+}
+
+echo
+echo "--- config.yaml (plataforma '$PLATFORM') ---"
+block="$(extract_platform_block "$CONFIG_FILE" "$PLATFORM")"
+echo "$block"
+
+enabled="$(printf '%s\n' "$block"  | awk -F': *' '/^[[:space:]]*enabled:/{print $2; exit}')"
+platform="$(printf '%s\n' "$block" | awk -F': *' '/^[[:space:]]*platform:/{print $2; exit}')"
+chat_id="$(printf '%s\n' "$block"  | awk -F'"'   '/chat_id:/{print $2; exit}')"
+
+if [[ -z "$enabled" || -z "$platform" || -z "$chat_id" ]]; then
+    aviso "Não foi possível extrair todas as chaves da plataforma '$PLATFORM'."
+fi
+
+if [[ ${#chat_id} -ge 6 ]]; then
+    chat_id_masked="${chat_id:0:3}***${chat_id: -2}"
+else
+    chat_id_masked="$chat_id"
+fi
+
+echo
+echo "=== Valores extraídos ==="
+printf '[enabled: %s, platform: %s, chat_id: "%s"]\n' \
+    "$enabled" "$platform" "$chat_id_masked"
 
 echo "----------------------------------------"
 
-
 # ============================================================
-# 14. INICIAR GATEWAY DO PROFILE
+# 11. RESULTADO
 # ============================================================
-
 echo
-echo "→ Iniciando gateway do profile..."
-
-# Windows + Git Bash:
-# NÃO utilizar setsid.
-
-hermes -p "$PROFILE_NAME" gateway run --replace \
-    > "$LOG_FILE" 2>&1 &
-
-GATEWAY_PID=$!
-
-echo "Gateway iniciado."
-echo "PID: $GATEWAY_PID"
-echo "Log: $LOG_FILE"
-
-
-# ============================================================
-# 15. AGUARDAR INICIALIZAÇÃO
-# ============================================================
-
+echo "============================================================"
+echo " ✅ PROFILE CRIADO COM SUCESSO!"
+echo "============================================================"
 echo
-echo "→ Aguardando inicialização..."
-
-sleep 8
-
-
-# ============================================================
-# 16. VERIFICAR GATEWAY
-# ============================================================
-
+echo "Profile Name (Agente) : $PROFILE_NAME"
 echo
-echo "→ Verificando profiles..."
-
-PROFILE_STATUS=$(
-    hermes profile list 2>/dev/null \
-    | awk -v profile="$PROFILE_NAME" '$1 == profile {print $3}'
-)
-
-
-# ============================================================
-# 17. RESULTADO
-# ============================================================
-
+echo "------------------------------------------------------------"
 echo
-
-if [[ "$PROFILE_STATUS" == "running" ]]; then
-
-    echo "============================================================"
-    echo " ✅ PROFILE CRIADO E ATIVO"
-    echo "============================================================"
-    echo
-    echo "Profile : $PROFILE_NAME"
-    echo "Status  : running"
-    echo "PID     : $GATEWAY_PID"
-    echo "Log     : $LOG_FILE"
-    echo
-
-else
-
-    echo "============================================================"
-    echo " ❌ PROFILE NÃO ESTÁ RUNNING"
-    echo "============================================================"
-    echo
-    echo "Status detectado: ${PROFILE_STATUS:-desconhecido}"
-    echo
-    echo "Últimas 30 linhas do log:"
-    echo "------------------------------------------------------------"
-
-    if [[ -f "$LOG_FILE" ]]; then
-        tail -30 "$LOG_FILE"
-    else
-        echo "Log não encontrado: $LOG_FILE"
-    fi
-
-    echo "------------------------------------------------------------"
-    echo
-
-    echo "Verifique também:"
-    echo
-    echo "    hermes profile list"
-    echo "    hermes gateway status"
-    echo
-
-    exit 1
-fi
+echo "Próximos passos:"
+echo
+echo "    hermes profile list"
+echo "    hermes gateway status"
+echo
