@@ -11,7 +11,7 @@ set -uo pipefail
 # 0. COMO UTILIZAR O SCRIPT
 # ============================================================
 # Abra o terminal de sua preferência (Git Bash, PowerShell, CMD) e navegue até o diretório onde está o script. 
-# MANDATÓRIO: Antes de executar o script rode o comando para carregar o TOKEN no buffer do shell:  export TELEGRAM_BOT_TOKEN="<token>"
+# MANDATÓRIO: Antes de executar o script rode o comando para carregar o TOKEN em uma variável de ambiente para o shell:  export TELEGRAM_BOT_TOKEN="<token>"
 # Exemplo de execução:
 #   export TELEGRAM_BOT_TOKEN="123456:ABCDEF"
 #   bash create-profile_win.sh
@@ -23,9 +23,9 @@ set -uo pipefail
 
 # ALTERAR SOMENTE ESTAS VARIÁVEIS PARA CRIAR UM NOVO PROFILE:
 # ↧------------------------------↧
-PROFILE_NAME_RAW="Redator_DocVet"       # Nome do profile
-CHANNEL_NAME="Revisor_DocVet"           # Nome amigável do bot (TELEGRAM_HOME_CHANNEL_NAME)
-USER_ID="758543036"                     # User ID do Telegram (DM) — pode adicionar vários separando por ,
+PROFILE_NAME_RAW="<profile_name>"       # Nome do profile
+CHANNEL_NAME="<bot_name>"               # Nome amigável do bot (TELEGRAM_HOME_CHANNEL_NAME)
+USER_ID="<user_id>"                     # User ID do Telegram (DM) — pode adicionar vários separando por ,
 DIRETORIO_HERMES="<local_do_hermes>"    # Caminho onde está o diretório do Hermes (geralmente em $HOME/AppData/Local/hermes para Windows)
 # ↥------------------------------↥
 

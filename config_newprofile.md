@@ -44,7 +44,7 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
 3. Navegue pelo terminal até a pasta onde se encontra o script;
 4. Execute o script com o seguinte comando:
     > [!NOTE]
-    > **Obs**.: Como não adcionamos o BOT_TOKEN ao script, vamos primeiramente carregar esta variável no boffer do shell para ser usado pelo script. Desta forma garantimos que o TOKEN não fique acidentalmente salvo no script e após a execução o buffer do shell é esvasiado, garantindo também que não ficou no terminal.
+    > **Obs**.: Como não adcionamos o BOT_TOKEN ao script, vamos primeiramente carregar uma variável de ambiente para o shell para ser usado pelo script. Desta forma garantimos que o TOKEN não fique acidentalmente salvo no script e após a execução esta variável de ambiente é esvasiado, garantindo também que não ficou no terminal.
 
     ```bash
     export TELEGRAM_BOT_TOKEN="<cole aqui o seu BOT_TOKEN>"
