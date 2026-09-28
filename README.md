@@ -12,7 +12,7 @@ Pensando nisso e partindo de uma necessidade pessoal, descidi documentar algumas
 Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto de vista do que se trata e o que é o **Hermes Agent**.
 
 > [!NOTE]
-> ➩ Criando multiplos Profiles e controlando pelo Telegram: [orquestrando_multi_agent-Telegram.md](orquestrando_multi_agent-Telegram.md)
+> ➩ Criando multiplos Profiles e controlando pelo Telegram: [multi_agent-Telegram.md](multi_agent-Telegram.md)
 > ➩ Configurando a Identidade e a Descrição dos Profiles: [profile_identity_describe.md](profile_identity_describe.md)
 > ➩ Configurando memória persistente: Em breve
 
