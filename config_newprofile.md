@@ -6,12 +6,11 @@ Existe uma tendência de evitar a utilização de comandos via terminal, mas atr
 > [!NOTE]
 > Para entendendo o que cada linha do script faz, leia os seguinte arquivo:
 >
-> ⇒ [explicando_script_create-profile.md](./telegram/scripts/explicando_script_create-profile.md)
+> ⇒ [explicando_script_create-profile.md](./scripts/explicando_script_create-profile.md)
 >
 > Ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
 
-* Para sistemas operacionais Windows utilize o script [create-profile_win.sh](./telegram/scripts/create-profile_win.sh)
-* Para sistemas operacionais Linux utilize o script [create-profile_lin.sh](./telegram/scripts/create-profile_lin.sh)
+* Para sistemas operacionais Windows/Linux utilize o script [create-profile.sh](./scripts/create-profile  .sh)
 
 Os comando podem ser diferentes conforme o sistema operacional. Como neste caso eu estou rodando em uma máquina local e a maioria das pessoas utiliza Windows, vou dar o exemplo utilizando comando para o OS Windows, mas a lógica continua a mesma para qualque OS.
 
@@ -22,7 +21,7 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
 
 ## Step 1. Preparando o script
 
-1. Agora abra o arquivo [create-profile_win.sh](./telegram/scripts/create-profile_win.sh) em um editor de código (IDE) de sua preferência:
+1. Agora abra o arquivo [create-profile.sh](./scripts/create-profile  .sh) em um editor de código (IDE) de sua preferência:
     Este são alguns exemplos, mas tem uma dezena de IDE para códigos (todos free)
 
     * [Visual Studio Code_MicroSoft](https://code.visualstudio.com/download?_exp_download=fb315fc982)
@@ -30,7 +29,7 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
     * [NotePad++](https://notepad-plus-plus.org/downloads/)
     </br>
 
-    No inicio do script temos o bloco de variáveis que devemos alterar para cada profile, portanto edite este trecho do código e coloque as informações necessárias solicitada. (use a planilha [profile_list.xlsx](./telegram/profiles_list.xlsx) para auxiliar).
+    No inicio do script temos o bloco de variáveis que devemos alterar para cada profile, portanto edite este trecho do código e coloque as informações necessárias solicitada. (use a planilha [profile_list.xlsx](./profiles_list.xlsx) para auxiliar).
     Exemplo:
 
     ```text
@@ -53,11 +52,11 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
     Confirme com \<ENTER>, e execute o script com o comando:
 
     ```bash
-    bash create-profile_win.sh
+    bash create-profile.sh
     ```
 
 5. Aguarde o processo finalizar acompanhando os outputs no terminal;
-6. Caso queira criar mais profiles, abra novamente o arquivo `create-profile_win.sh` e altere os dados para o próximo agente e repita a execução do script;
+6. Caso queira criar mais profiles, abra novamente o arquivo `create-profile   .sh` e altere os dados para o próximo agente e repita a execução do script;
 7. Continue repetindo este processo até cadastrar todos os profiles.
 8. Para conferirmos se todos os agentes foram cadastrados no Hermes, execute novamente o comando no terminal:
 
@@ -67,7 +66,7 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
 
     Vamos ter algo como:
 
-    ![status2](./telegram/img/status_profile2.png)
+    ![status2](./img/status_profile2.png)
 
 ---
 
@@ -112,10 +111,10 @@ Para forçarmos a reativação dos gateway abra o terminal e execute o comando p
     hermes gateway list
     ```
 
-2. Executando por Script -> [wakeup-gateway_win.sh](./telegram/scripts/wakeup-gateway_win.sh)
+2. Executando por Script -> [wakeup-gateway_win.sh](./scripts/wakeup-gateway_win.sh)
 3. E para ver as portas que cada Gateway esta rodando utilize o comando `hermes gateway list`.
 </br>
-    ![statusgateway](./telegram/img/status_profile3.png)
+    ![statusgateway](./img/status_profile3.png)
 
 ### ⟹ Para sistemas operacionais Linux utilize:
 
@@ -127,5 +126,5 @@ Para forçarmos a reativação dos gateway abra o terminal e execute o comando p
     hermes gateway list
     ```
 
-2. Executando por escript -> [wakeup-gateway_lin.sh](./telegram/scripts/wakeup-gateway_lin.sh)
+2. Executando por escript -> [wakeup-gateway_lin.sh](./scripts/wakeup-gateway_lin.sh)
 3. E para ver as portas que cada Gateway esta rodando utilize o comando `hermes gateway list`

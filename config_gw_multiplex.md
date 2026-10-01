@@ -31,15 +31,18 @@ Vamos configurar:
 
 ## Step 1. Verificar o config.yaml do perfil default
 
-Considerando que o profile default já tenha sido criado durante a instalação do Hermes, podemos encontrar o perfil default na pasta raiz do Hermes em (`$HOME/AppData/Local/hermes` no Windows).
-Para acessar esta pasta:
+Considerando que o profile default já tenha sido criado durante a instalação do Hermes, podemos encontrar o perfil default na pasta raiz do Hermes em:
+> `$HOME/AppData/Local/hermes` no Windows
+> `$Home/<user>/.hermes` no Linux
+
+No Windows pode acessar através comando "Executar":
 
 1. utilize a tecla Win+R -> abre a janela executar.
 2. Escreva o comando na linha "Abrir" em confirme com "Enter"
 
-```bash
-%LOCALAPPDATA%\hermes
-```
+    ```bash
+    %LOCALAPPDATA%\hermes
+    ```
 
 Procure o arquivo **`config.yaml`** e abra em um editor de código.
 O arquivo terá algo como:
@@ -108,7 +111,8 @@ platforms:
       chat_id: "xxxxxxxxx"
 ```
 
-> **⚠️ Importante:** Um `home_channel` incompleto (com apenas `platform:` e sem `chat_id`) causa `KeyError: 'chat_id'` e impede o gateway de iniciar. Ou o bloco está completo, ou não está presente (se Telegram não for usar).
+> **⚠️ Importante:**
+> Um `home_channel` incompleto (com apenas `platform:` e sem `chat_id`) causa `KeyError: 'chat_id'` e impede o gateway de iniciar. Ou o bloco está completo, ou não está presente (se Telegram não for usar).
 
 ## Step 4. Registar o Gateway no Windows (Scheduled Task / Startup)
 

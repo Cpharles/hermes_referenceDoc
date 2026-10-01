@@ -1,3 +1,5 @@
+```bash
+
 #!/usr/bin/env bash
 
 # ============================================================
@@ -56,7 +58,7 @@ HERMES_HOME="$DIRETORIO_HERMES"
 PROFILE_DIR="$HERMES_HOME/profiles/$PROFILE_NAME"
 ENV_FILE="$PROFILE_DIR/.env"
 CONFIG_FILE="$PROFILE_DIR/config.yaml"
-SOUL_FILE="$PROFILE_DIR/soul.md"
+SOUL_FILE="$PROFILE_DIR/SOUL.md"
 
 # ============================================================
 # 3. FUNÇÕES AUXILIARES
@@ -360,3 +362,4 @@ echo
 echo "    hermes profile list"
 echo "    hermes gateway status"
 echo
+```

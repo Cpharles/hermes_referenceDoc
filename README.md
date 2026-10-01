@@ -27,8 +27,7 @@ Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto d
 
 Lendo alguns artigos sobre o assunto, observei que alguns estão chamando o Hermes Agent de **Frameworks**, mas quero registrar uma distinção importante sobre esta afirmação.
 O Hermes Agent pode ser chamado de framework, mas arquiteturalmente ele é mais bem entendido como uma **plataforma/runtime de agente autônomo** que incorpora um **framework de ferramentas, memória, skills e execução**.
-
-A propria literatura do Hermes Agent da Nous Research, é um projeto open source sob licença MIT e possui CLI, memória persistente, skills, ferramentas, MCP, subagentes, automações e diferentes backends de execução.
+A própria literatura do Hermes Agent da Nous Research já afirma isso quando afirma e apresnta que é dotado de CLI, memória persistente, skills, ferramentas, MCP, subagentes, automações e diferentes backends de execução.
 
 ### 1. Por que o Hermes Agent pode ser considerado um framework?
 
@@ -55,3 +54,13 @@ No Hermes, temos vários componentes que formam essa infraestrutura:
                │
           Cloud / VPS
 ```
+
+### 2. Conceito do Que é Agente
+
+#### Agente
+
+Em uma frase: Um Agente é um funcionário de IA — um cargo configurado com um cargo específico.
+
+A analogia: Criar um agente com abilidades de um corretor, de um empreiteiro, de um programador, etc... Você não apenas insere "uma IA", que é o cerebro do agente — você define o cargo, descreve pelo que ela é responsável, dá as ferramentas de que precisa, diz para quem responde e outros atributos.
+
+Por que o Agente existe: Sem agentes, não temos ninguém para fazer o trabalho. A camada de agente é o que transforma um objetivo em ação. Cada agente tem um papel claramente definido para que vários agentes possam colaborar sem confusão sobre quem é responsável por quê.
