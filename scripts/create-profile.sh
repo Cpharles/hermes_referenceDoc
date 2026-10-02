@@ -199,6 +199,9 @@ if ! grep -q '^platforms:' "$CONFIG_FILE"; then
 platforms:
   telegram:
     enabled: true
+    extra:
+      allow_admin_from: "$USER_ID"
+      user_allowed_commands: []
     home_channel:
       platform: telegram
       chat_id: "$HOME_CHANNEL_ID"
@@ -214,6 +217,9 @@ elif ! grep -q '^[[:space:]]\{2,\}telegram:[[:space:]]*$' "$CONFIG_FILE"; then
             if (!inserted && $0 ~ /^platforms:[[:space:]]*$/) {
                 print "  telegram:"
                 print "    enabled: true"
+                print "    extra:"
+                print "      allow_admin_from: \"" ENVIRON["USER_ID"] "\""
+                print "      user_allowed_commands: []"
                 print "    home_channel:"
                 print "      platform: telegram"
                 print "      chat_id: \"" id "\""
@@ -247,6 +253,12 @@ else
                 }
                 if ($0 ~ /^[[:space:]]*chat_id:/) {
                     sub(/chat_id:[[:space:]]*.*/, "chat_id: \"" id "\"")
+                }
+                if ($0 ~ /^[[:space:]]*allow_admin_from:/) {
+                    sub(/allow_admin_from:[[:space:]]*.*/, "allow_admin_from: \"" ENVIRON["USER_ID"] "\"")
+                }
+                if ($0 ~ /^[[:space:]]*user_allowed_commands:/) {
+                    sub(/user_allowed_commands:[[:space:]]*.*/, "user_allowed_commands: []")
                 }
             }
         }

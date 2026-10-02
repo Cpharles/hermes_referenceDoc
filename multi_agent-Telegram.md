@@ -187,7 +187,7 @@ Para uma aplicação de automação com conectores (chamado também de **Platafo
 É justamente o nosso caso, pois estaremos utilizando a plataforma Telegram para fazer a interação com multiplos agentes.
 Vamos pausar um pouco aqui e seguir em outro documento, onde temos a explicação da diferença entre os protocolos e como implantar **gateway multiplexado**.
 
-:books: ⇒ Abra o arquivo [config_multiplex.md](config_gw_multiplex.md)</br>
+:books: ⇒ Abra o arquivo [config_gw_multiplex.md](config_gw_multiplex.md)</br>
 
 Caso a sua aplicação tenha apenas um **único agente** interagindo com a plataforma, o recomendado é utilizar o **gateway single-channel protocol**, neste caso siga as instruções em:
 
@@ -278,8 +278,13 @@ Vamos criar um grupo pra cada setor da empresa: Performance, SAC, Comercial, Con
 
 ### Testando a comunicação
 
-Antes de colocarmos os agentes em operação, vamos testar se eles estão recebendo e retornando respostas via grupo.
-> [!NOTE]
+Antes de colocarmos o agente em operação temos que informar para o Hermes qual é o canal principal de comunicação do bot com o chefe (neste caso você). Vamos executar o seguinte comando no chat do bot:
+    `/sethome`
+
+Para confirmar quem é o administrador deste canal é só digitar:
+    `/whoami`
+
+> [!TIP]
     Certifique-se de que a sua API key esta ativa no seu **Provider**, mesmo ser for free, caso seja uma assinatura paga, verifique se tem credito disponível para rodar os modelos escolhido.
 
 Entre em um grupo e envie uma mensagem, por exemplo:  `Boa tarde, seja bem vindo ao grupo...`
@@ -295,3 +300,24 @@ Caso o agente não esteja retornando ou mesmo alguma mensagem de erro, verifique
     ![gateway1](./img/gateway1.png)
 
 Depois tente novamente mandar a mensagem.
+
+---
+
+## Resumo de Comandos
+
+Depois de criado o bot e cadastrado os paramentros do mesmo no profile dele dentro do hermes, execute:
+Telegram:
+
+```dash
+# Confirmar pings de inicialização da plataforma sem retransmissão
+/start
+
+# Reinicie o gateway de forma graciosa após drenar as execuções ativas.
+/restart
+
+# Defina este chat como o canal principal.
+/sethome
+
+# Mostra o seu acesso a comandos de barra que pode ser (admin / user)
+/whoami
+```

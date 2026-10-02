@@ -69,9 +69,7 @@ Modelo especializado em **HTML → JSON / extração estruturada**, disponível 
 
 Ele faz sentido quando a tarefa é essencialmente:
 
-```text
-documento → campos definidos → JSON
-```
+`documento → campos definidos → JSON`
 
 e não exige raciocínio aberto.
 
@@ -220,9 +218,7 @@ enums quando possível
 
 Evite pedir:
 
-```text
-"Explique detalhadamente sua análise..."
-```
+`"Explique detalhadamente sua análise..."`
 
 quando basta:
 
