@@ -141,11 +141,12 @@ fi
 # 6. CRIAR PROFILE
 # ============================================================
 echo
-echo "→ Criando profile: '$PROFILE_NAME' (clone de '$CLONE_FROM')..."
+echo "╭⎯⎯  Criando profile: '$PROFILE_NAME' (clone de '$CLONE_FROM')...  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯╮"
 
 if ! hermes profile create "$PROFILE_NAME" --clone-from "$CLONE_FROM"; then
     erro "Falha ao criar o profile."
 fi
+echo "╰⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯╯"
 
 ok "Profile criado."
 
@@ -161,9 +162,9 @@ ok "Arquivo .env encontrado."
 $CONFIG_FILE"
 ok "Arquivo config.yaml encontrado."
 
-[[ -f "$SOUL_FILE"   ]] || erro "Arquivo soul.md não encontrado:
+[[ -f "$SOUL_FILE"   ]] || erro "Arquivo SOUL.md não encontrado:
 $SOUL_FILE"
-ok "Arquivo soul.md encontrado."
+ok "Arquivo SOUL.md encontrado."
 
 normalize_lf "$ENV_FILE"
 normalize_lf "$CONFIG_FILE"
@@ -336,11 +337,6 @@ if [[ ${#chat_id} -ge 6 ]]; then
 else
     chat_id_masked="$chat_id"
 fi
-
-echo
-echo "=== Valores extraídos ==="
-printf '[enabled: %s, platform: %s, chat_id: "%s"]\n' \
-    "$enabled" "$platform" "$chat_id_masked"
 
 echo "----------------------------------------"
 

@@ -93,10 +93,10 @@ Após a criação teremos uma estrutura:
 
 ## Step 3. Configurar o Telegram no config.yaml do profile
 
-Como estamos utilizando o Telegram em algum dos perfis, temos que certificar que temos o bloco `platforms:` presente no config.yaml do **profile** (não na raiz) e deve conter a instrução para `home_channel` com `chat_id`.
-Abra o arquivo **config.yaml** do profile em um editor de código (IDE), o arquivo se localisa em:</br>
+Como estamos utilizando o Telegram em algum dos perfis, temos que certificar que temos o bloco `platforms:` presente no arquivo config.yaml do **novo profile** (não no profile que se encontra do diretório raiz), este arquivo deve conter a instrução para `home_channel` e `chat_id`.
+Abra o arquivo **config.yaml** do novo profile em um editor de código (IDE), o arquivo se localiza em:</br>
 
-Edite `%LOCALAPPDATA%\hermes\profiles\meu-novo-profile\config.yaml`:
+(para Windows) `%LOCALAPPDATA%\hermes\profiles\meu-novo-profile\config.yaml`:
 
 Caso o bloco `platforms:` não esteja presente, escreva ao final do arquivo.
 
@@ -114,11 +114,49 @@ platforms:
 > **⚠️ Importante:**
 > Um `home_channel` incompleto (com apenas `platform:` e sem `chat_id`) causa `KeyError: 'chat_id'` e impede o gateway de iniciar. Ou o bloco está completo, ou não está presente (se Telegram não for usar).
 
-## Step 4. Registar o Gateway no Windows (Scheduled Task / Startup)
+## Step 4. Migrar os Gateways para um Gateway
+
+Esta etapa **só será necessário caso o Windows não tenha dado permisão** automática para o Hermes registrar o multiplex channel, pois a documentação do Hermes menciona que o gateway multiplex já é habilitado por padrão no arquivo `config.yaml`, ou seja, podemos verificar isso em:
+
+```yaml
+gateway:
+  multiplex_profiles: true
+```
+
+Portanto, não é necessário habilitar o recurso para instalações novas, desde que nenhuma condição impeça a migração automática.
+A documentação explica que, quando a configuração está indefinida, o Hermes faz uma avaliação durante o boot. Se a instalação puder ser multiplexada com segurança, ele ativa o modo; caso contrário, mantém o Gateway standalone e registra o motivo.
+Portanto, existem três situações conceituais:
+
+```text
+multiplex_profiles: true
+        │
+        └──► força Multiplexing
+
+multiplex_profiles: false
+        │
+        └──► Gateway standalone
+
+não definido
+        │
+        └──► Hermes decide no boot
+```
+
+Ai vem a pergunta, "Tá, mas como identificar se o gateway multiplex entrou de forma automática no meu sistema?"
+Ao executar o comando abaixo, podemos ver no output que cada profile tem seu gateway direcionado para o **default gateway** 
+
+```bash
+hermes gateway list
+```
+
+---
+
+### Como habilitar explicitamente
+
+### Somente para Windows (Scheduled Task / Startup)
 
 Antes da migração para multiplex, o gateway do perfil default precisa ser registrado para iniciar automaticamente no login do Windows.
 
-### Opção A — Instalar via comando Hermes (recomendado)
+#### Opção A — Instalar via comando Hermes (recomendado)
 
 Abra o terminal bash (ou outro de sua preferencia como PowerShell) e navegue até a pasta raiz do Hermes
 
@@ -144,7 +182,7 @@ O comando `hermes gateway install` cria:
 
 Se o comando detetar que UAC (User Account Control_Segurança de Computador) está bloqueando o Scheduled Task, ele recorre automaticamente ao Startup folder.
 
-### Opção B — Registar manualmente no Startup folder
+#### Opção B — Registar manualmente no Startup folder
 
 Criar um arquivo `Hermes_Gateway.vbs` na pasta:
 
@@ -161,7 +199,7 @@ WshShell.Run "cmd.exe /c C:\Users\<user>\AppData\Local\hermes\bin\hermes gateway
 
 > Isso inicia o gateway em background quando o Windows faz login.
 
-### Verificar se está registado
+#### Verificar se está registado
 
 ```bash
 # Listar gateways ativos
@@ -354,4 +392,4 @@ type %LOCALAPPDATA%\hermes\gateway_migration.json
 ---
 
 *Documentação de referência para configuração do Hermes Agent com multiplex.*
-*Atualizado em 2026-09-24.*
+*Atualizado em 2026-10-01.*
