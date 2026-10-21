@@ -10,7 +10,7 @@ Ele possui dois componentes distintos que operam em níveis diferentes do sistem
 ### 1. Identidade (SOUL.md) — quem o agente *é***
 
 > [!TIP]
-> :brain: **Documentação oficial:**
+> :brain: **Documentação oficial:**<br>
 > [Identidade - SOUL.md](https://hermes-agent.nousresearch.com/docs/user-guide/features/personality)
 
 - É o conteúdo carregado como **slot #1 do system prompt**, ou seja, entra na janela de contexto do modelo a cada execução;
@@ -24,8 +24,8 @@ Ele possui dois componentes distintos que operam em níveis diferentes do sistem
 
 > [!TIP]
 > :brain: **Documentação oficial:**
-> [Descrição de um Profile](https://hermes-agent.nousresearch.com/docs/reference/profile-commands#hermes-profile-describe)
-> [Configuração do Profile](https://hermes-agent.nousresearch.com/docs/user-guide/profiles)
+> [Descrição de um Profile](https://hermes-agent.nousresearch.com/docs/reference/profile-commands#hermes-profile-describe)<br>
+> [Configuração do Profile](https://hermes-agent.nousresearch.com/docs/user-guide/profiles)<br>
 > [Configuração de um Agente](https://hermes-agent.nousresearch.com/docs/user-guide/configuration)
 
 - É um **campo de metadados** (`description` no `profile.yaml`), tipicamente 1–2 frases curtas;
@@ -42,7 +42,7 @@ Ele possui dois componentes distintos que operam em níveis diferentes do sistem
 | `profile.yaml` | Descrição curta (1-2 frases) para roteamento do orquestrador |
 
 **Síntese em uma frase:**
-> **Identidade** é a persona operacional que o modelo executa;
+> **Identidade** é a persona operacional que o modelo executa;<br>
 > **Descrição** é o rótulo de especialidade que o sistema usa para distribuir trabalho.
 
 **Consequência prática:**
@@ -85,6 +85,6 @@ Podemos atualizar via **CLI** - (terminal) ou editando o arquivo diretamente com
         ```
 
         > [!NOTE]
-        > A descrição é persistida ali para sobreviver a reboots e ser compartilhada com o gateway.
+        > A descrição é persistida ali para sobreviver a reboots e ser compartilhada com o gateway.<br>
         > A descrição é consumida pelo **orquestrador kanban** para rotear tarefas com base no papel de cada perfil.
 
