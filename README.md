@@ -11,9 +11,11 @@ Navegando na web eu pude entrontrar vários entusiastas de automação comentand
 Pensando nisso e partindo de uma necessidade pessoal, descidi documentar algumas aplicações de uso do Hermes Agent em projetos reais conforme eu vou estudando, tanto para minha consulta futura assim como, compartirlhar com outros que querem ter uma documentação prática com caso de uso.
 Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto de vista do que se trata e o que é o **Hermes Agent**.
 
-> ➩ Criando multiplos Profiles e controlando pelo Telegram: [multi_agent-Telegram.md](multi_agent-Telegram.md) .
-> ➩ Configurando a Identidade e a Descrição dos Profiles: [profile_identity_describe.md](profile_identity_describe.md) .
-> ➩ Configurando memória persistente: Em breve.
+```text
+➩ Criando multiplos Profiles e controlando pelo Telegram: [multi_agent-Telegram.md](multi_agent-Telegram.md)
+➩ Configurando a Identidade e a Descrição dos Profiles: [profile_identity_describe.md](profile_identity_describe.md)
+➩ Configurando memória persistente: Em breve.
+```
 
 > Documentação Oficial:
     - Pagina oficial do projeto no GitHub: [Hermes-Agent](https://github.com/NousResearch/hermes-agent)
