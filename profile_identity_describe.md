@@ -46,11 +46,11 @@ As duas devem ser consistentes — a descrição promete uma especialidade (ex.:
 
 ## Atualizando - Identidade
 
-Podemos atualizar via **CLI** - (terminal) ou editando o arquivo diretamente com um editor de texto.
+* Podemos atualizar via **Dashboard** ou editando o arquivo diretamente com um editor de texto.
 
 ## Atualizando - Descrição
 
-Podemos atualizar via **CLI** - (terminal) ou editando o arquivo diretamente com um editor de texto.
+* Podemos atualizar via **CLI** - (terminal) ou editando o arquivo diretamente com um editor de texto.
 
 1. Via CLI (terminal):
 
