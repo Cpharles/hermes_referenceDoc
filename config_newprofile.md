@@ -21,7 +21,7 @@ Os comando podem ser diferentes conforme o sistema operacional. Como neste caso 
 
 ## Step 1. Preparando o script
 
-1. Agora abra o arquivo [create-profile.sh](./scripts/create-profile  .sh) em um editor de código (IDE) de sua preferência:
+1. Agora abra o arquivo [create-profile.sh](./scripts/create-profile.sh) em um editor de código (IDE) de sua preferência:
     Este são alguns exemplos, mas tem uma dezena de IDE para códigos (todos free)
 
     * [Visual Studio Code_MicroSoft](https://code.visualstudio.com/download?_exp_download=fb315fc982)

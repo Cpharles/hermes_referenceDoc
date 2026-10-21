@@ -137,7 +137,7 @@ Temos dois caminhos para acordar os bots:
 ### Step 1. Criando Profiles Hermes
 
 Quando fazemos a instalação do Hermes Agent obrigatoriamente temos que configurar um **profile default** que é a primeira solicitação do Hermes. Seguindo o passo a passo fornecido pelo instalador, vamos receber algumas perguntas de confirmações e fornecer algumas informações.
-Caso vc já tenha instalado e tenha vários profiles, não é necessário desistalar, apenas escolha qual dos profiles e de preferencia o primeiro que foi criado para ser **setado como agente default**. E porque dissso?; Simplesmente poque o primeiro profile criado que é chamado de default cria toda a sua estrutura de pastas na raiz do Hermes, e consequentemente este profile poderá ser utilizado como base para (clonado) criação de outros profiles.</br>
+Caso vc já tenha instalado e tenha vários profiles, não é necessário desistalar, apenas escolha qual dos profiles e de preferencia o primeiro que foi criado para ser **definido como agente default**. E porque dissso?; Simplesmente poque o primeiro profile criado que é chamado de default cria toda a sua estrutura de pastas na raiz do Hermes, e consequentemente este profile poderá ser utilizado como (clone) base para criação de outros profiles.</br>
 Para saber a insformação do seu profile default vamos executar:
 
 1. Abra o terminal **Git Bash** (obs. 1) ou o terminal CLI local do seu VPS na seção do Hermes.

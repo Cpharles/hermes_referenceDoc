@@ -112,6 +112,7 @@ platforms:
 ```
 
 > **⚠️ Importante:**
+> Se a variável `enable: false` o Telegram não vai se conectar a porta PID
 > Um `home_channel` incompleto (com apenas `platform:` e sem `chat_id`) causa `KeyError: 'chat_id'` e impede o gateway de iniciar. Ou o bloco está completo, ou não está presente (se Telegram não for usar).
 
 ## Step 4. Migrar os Gateways para um Gateway

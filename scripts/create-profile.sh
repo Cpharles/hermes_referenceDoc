@@ -13,10 +13,13 @@ set -uo pipefail
 # Abra o terminal de sua preferência (Git Bash, PowerShell, CMD) e navegue até o diretório onde está o script. 
 # MANDATÓRIO: Antes de executar o script rode o comando para carregar o TOKEN em uma variável de ambiente para o shell:  export TELEGRAM_BOT_TOKEN="<token>"
 # Exemplo de execução:
-#   export TELEGRAM_BOT_TOKEN="123456:ABCDEF"
-#   bash create-profile_win.sh
-
-
+#   Somente terminal Linux ou Git Bash:
+#       export TELEGRAM_BOT_TOKEN="123456:ABCDEF..."
+#       bash create-profile_win.sh
+#   Somente para Windows PowerShell (usando WSL):
+#       $env:TELEGRAM_BOT_TOKEN="123456:ABCDEF..."
+#       wsl bash create-profile_win.sh
+#
 # ============================================================
 # 1. CONFIGURAÇÃO DO NOVO PROFILE
 # ============================================================
@@ -28,7 +31,8 @@ CHANNEL_NAME="<bot_name>"               # Nome amigável do bot (TELEGRAM_HOME_C
 USER_ID="<user_id>"                     # User ID do Telegram (DM) — pode adicionar vários separando por ,
 DIRETORIO_HERMES="<local_do_hermes>"    # Caminho onde está o diretório do Hermes
 # (padrão para Windows em $HOME/AppData/Local/hermes)
-# (padrão para Linux em $HOME/<user>/.hermes)
+# (padrão para Linux Descktop em $HOME/<user>/.hermes)
+# (padrão para Linux Server em /opt/data/)
 # ↥------------------------------↥
 
 
@@ -141,12 +145,12 @@ fi
 # 6. CRIAR PROFILE
 # ============================================================
 echo
-echo "╭⎯⎯  Criando profile: '$PROFILE_NAME' (clone de '$CLONE_FROM')...  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯╮"
+echo "╭⎯⎯  Criando profile: '$PROFILE_NAME' (clone de '$CLONE_FROM')...  ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯╮"
 
 if ! hermes profile create "$PROFILE_NAME" --clone-from "$CLONE_FROM"; then
     erro "Falha ao criar o profile."
 fi
-echo "╰⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯╯"
+echo "╰⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯╯"
 
 ok "Profile criado."
 
@@ -204,7 +208,7 @@ platforms:
       user_allowed_commands: []
     home_channel:
       platform: telegram
-      chat_id: "$HOME_CHANNEL_ID"
+      chat_id: "$HOME_CHANNEL_ID"   # chat liberado somente para o administrador do bot (DM), altere o valor para [] se quiser liberar o chat para múltiplos usuários
 EOL
     ok "Seção 'platforms.telegram' adicionada ao config.yaml."
 
@@ -362,10 +366,8 @@ echo "============================================================"
 echo
 echo "Profile Name (Agente) : $PROFILE_NAME"
 echo
-echo "------------------------------------------------------------"
 echo
-echo "Próximos passos:"
+echo "obs.: Para ver a listagem dos profiles execute:"
 echo
 echo "    hermes profile list"
-echo "    hermes gateway status"
 echo
