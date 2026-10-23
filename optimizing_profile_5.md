@@ -60,9 +60,9 @@ adm-docs/
   evaluations/     # casos de avaliação e resultados
 ```
 
-#### 3.1 Criando o Workspace
+### 4 Criando o Workspace
 
-##### 3.1.1 Visão Geral do Terminal Backend
+#### 4.1 Visão Geral do Terminal Backend
 ([link_doc](https://hermes-agent.nousresearch.com/docs/user-guide/configuration#terminal-backend-configuration))
 
 *Terminal Backend Configuration* apresenta os backends disponíveis para definir onde os comandos de shell do agente realmente são executados. A tabela oficial lista **seis backends nativos** (*local, docker, ssh, modal, daytona, vercel_sandbox*) e a seção **Singularity/Apptainer** como backend de plugin (oficial), totalizando **sete abordagens** distintas. Segue a descrição prática de quando usar cada uma.
@@ -117,7 +117,7 @@ Pelo Dashboard acesse:
 **Onde roda:** contêiner Singularity/Apptainer com `--containall --no-home`.
 **Quando usar:** clusters HPC e máquinas compartilhadas onde Docker **não está disponível**. É um plugin oficial (instale com `hermes plugins install singularity`) e requer `apptainer` ou `singularity` no `$PATH`. Usa diretório scratch típico de HPC (`/scratch/$USER/...`) e converte imagens `docker://` para SIF em cache.
 
-##### 3.1.2 Regra prática de escolha
+#### 4.2 Regra prática de escolha
 | Objetivo | Terminal Backend |
 |---|---|
 | Confiança total / simplicidade | `local` |
@@ -133,7 +133,7 @@ Pelo Dashboard acesse:
 
 **Obs.**: Para uma configuração inicial, vamos iniciar pela *opção 1* com execução *"Local"* e depois migramos para a opção 2 que seria em um ambiente controlado por docker.
 
-##### 3.1.3 Apontamento do Diretorio para nosso Workspace
+#### 4.3 Apontamento do Diretorio para nosso Workspace
 Podemos executar via CLI ou configurar via dashboard
 por CLI:
 
@@ -150,7 +150,7 @@ por dashboard:
 
 <br>
 
-#### 3.2 Versionamento de Documentos
+### 5. Versionamento de Documentos
 Para esta etapa é extremamente importante mantermos e definirmos um fluxo de versão e revisão para cada documento que deve ser registrar:
 
  - autor/revisor,
@@ -179,8 +179,9 @@ E para garantir este fluxo vamos adotar o seguinte critério inicial:
 1. Criar uma *Skill* com os critério de controle dos documentos. A Skill orienta o agente sobre a convenção e os metadados.
 2. Criar um diretório para as versões anteriores
 2. Para o controle do vercionamento vamos utilizar um *repositório no GitHub*, mas exigindo aprovação antes de publicar, substituir a versão vigente ou mudar o estado para “aprovado” antes do "pull request".
+<br>
 
-##### 3.2.1 Recurso exigido
+#### 5.1 Recurso exigido
 Temos que verificar se já temos instalado em nosso sistema o *git* e o *GitHub CLI*
 
 ```bash
@@ -194,7 +195,9 @@ gh --version    # verifica a existência do gh cli
 > [!WARNING]
 > Se o Hermes esta rodando em um conteiner docker a instalação do GitHub CLI deve ser feito por outro caminho.
 
-##### 3.2.2 Instando GitHub CLI para o Hermes dentro do conteiner
+<br>
+
+#### 5.2 Instando GitHub CLI para o Hermes dentro do conteiner
 
 O cenário que temos é (**VM Ubuntu → Dokploy → contêiner Hermes**), para instalarmos o GitHub CLI dentro do contêiner Hermes podemos fazer de duas formas:
 
@@ -205,8 +208,9 @@ O cenário que temos é (**VM Ubuntu → Dokploy → contêiner Hermes**), para 
 *Qual escolher?*
 Na opção 1 basicamente é recriar a imagem com uma alteração, mas de forma manual e portanto teremos o inconveniente de termos que recriar esta imagem todas as vezes que for necessário a atualização ou um novo redeploy da aplicação.
 Agora para deixarmos de forma automática, podemos incluir a instrução **build:** no arquivo docker-compose. Portanto vamos escolher a opção 2.
+<br>
 
-**Passo 1: Escrever o Dockerfile**
+##### **Passo 1: Escrever o Dockerfile**
 Crie um arquivo`Dockerfile` sem extenção :
 - O método de instalação do gh acima segue o procedimento padrão do repositório oficial do GitHub CLI para **Ubuntu/Debian**, e também há precedentes na base de código do próprio Hermes de instalação do gh na camada apt da imagem base.
 - Conteúdo do Dockerfile (baseado na documentação oficial do GitHub CLI )
@@ -232,15 +236,18 @@ RUN apt-get update && \
 
 USER hermes
 ```
+<br>
 
-**Passo 2: Preparar os arquivos no repositório Git**
+##### **Passo 2: Preparar os arquivos no repositório Git**
 Vamos criar um repositório, caso ainda não tenha, para que o Dokploy utilize para fazer a leitura dos arquivos. Vamos precisar ter dois arquivos na raiz do repo (ou no caminho que você define como Compose Path):
 
 > **Dockerfile**: O arquivo que instala o gh.
 >
 > **docker-compose.yml**: O arquivo que orquestra o serviço.
 
-**Passo 3: Configurar o docker-compose.yml no Dokploy**
+<br>
+
+##### **Passo 3: Configurar o docker-compose.yml no Dokploy**
 Aqui está o ponto crucial. O Dokploy limpa o diretório do repositório a cada deploy (AutoDeploy). Isso significa que você não pode usar bind mounts com caminhos relativos do repositório (ex: ./config:/opt/data) para dados persistentes, pois eles serão perdidos.
 Vamos alterar o no arquivo dentro do Dokploy, e o docker-compose.yml deve iniciar assim:
 
@@ -263,7 +270,7 @@ services:
   hermes:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: hermes-gh.Dockerfile
     restart: unless-stopped
     command: gateway run
     ports:
@@ -281,9 +288,11 @@ O que mudou e por quê:
 - apontamento do Token do GitHub para variável de ambiente.
 
 > [!WARNING]
-> Para o apontamento da **variável de ambiente** para o **GT_TOKEN**, registramos na opção **Enviroment** dentro do aplicativo no Dokploy:
+> Para o apontamento da **variável de ambiente** para o **GH_TOKEN**, registramos na opção **Enviroment** dentro do aplicativo no Dokploy:
 
-**Passo 4: Configurar o apontamento dos arquivos no Dokploy**
+<br>
+
+##### **Passo 4: Configurar o apontamento dos arquivos no Dokploy**
 > tutorial de referência [video](https://www.youtube.com/watch?v=j9r2mdzBZcQ)
 
 Ainda dentro da aplicação e na seção **Geral** vamos fornecer o **Provider** para o Compose File, neste caso vamos optar por **GitHub**
@@ -313,88 +322,74 @@ Retornamos para o Dokploy e agora podemos ver que temos a conecção e uma **Act
   <img width="270" title="gh9" src="./img/gh9.png"/>
 </div>
 
-Agora vamos retornar para o nosso projeto em "Projct" no menu do lado esquerdo, clique no projeto e entre no serviço do aplicativo, role até a área do "Provider", selecione novamente a opão GitHub e poderemos notar que agora temos um **GitHub Account**, vamos prencher os campos. Para o "Compose Path", coloque o caminho onde esta os arquivos docker-compose dentro do repo, no meu caso eu criei uma pasta "docker". Finalize **Salvando o Provider**.
+Agora vamos retornar para o nosso projeto em "Project" no menu do lado esquerdo, clique no projeto e entre no serviço do aplicativo, role até a área do "Provider", selecione novamente a opão GitHub e poderemos notar que agora temos um **GitHub Account**, vamos prencher os campos. Para o "Compose Path", coloque o caminho onde esta os arquivos docker-compose dentro do repo, no meu caso eu criei uma pasta "docker". Finalize **Salvando o Provider**.
 <div align="left"> <img width="600" title="gh10" src="./img/gh10.png"/> </div><br>
 
 > [!NOTE]
 > A configuração explicada até este ponto, foi para disponibilizar acesso ao Dokploy a um repositório específico no GitHub para fazer a clonagem dos arquivos do docker-compose file.
 
-**Passo 5: Permissão de Gerenciamento do Versionamento e Fazer o Deploy**
+<br>
+
+##### **Passo 5: Permissão de Gerenciamento do Versionamento e Fazer o Deploy**
 Para darmos acesso ao nosso agente para gerenciar o sistema de versionamento montado no GitHub, vamos precisar autenticar (permitir) que o GitHub CLI tenha acesso ao GitHub pelo agente para executar comandos de versionamento. Como nosso ambiente é headless (sem navegador ou seja um servidor), a forma mais recomendada é usar um **Personal Access Token (PAT)** através da variável de ambiente GH_TOKEN inserido no "**Enviroment**" do Dokploy.
 Para este projeto estarei criando um novo repositório privado, por se tratar de documentação versionada de acesso restrito ao projeto.
 
-**Criando GitHub App**
+**Gerando Token de acesso ao GitHub**
 1. Faça login na sua conta do GitHub
 2. Clique na sua foto do perfil no canto superior direito da página e selecione "**Settings**" (Configurações) no menu suspenso.
-3. Na barra lateral esquerda, clique em "**Developer settings**" (Configurações de desenvolvedor) e, em seguida, clique em **New GitHub App**
-4. Preencher os campos:
-    1. GitHub App name
-    2. Homepage URL: fornecer a URL de acesso a API do Hermes, por padrão esta na **porta 8642**, portanto fica `https://<URL_Servidor>:8642`
-    3. Redirect URI: fornecer uma URL de 
+3. Na barra lateral esquerda, clique em "**Developer settings**" (Configurações de desenvolvedor)
+4. Expanda Personal access tokens → clique em Fine-grained tokens.
+5. Clique em Generate new token.
+    <div align="left"> <img width="600" title="gh11" src="./img/gh11.png"/> </div><br>
+6. Preencha e selecione conforme abaixo:
+    * **Token name**: Insira um nome descritivo, por exemplo hermes-agent-docs-repo.
+    * **Expiration**: Selecione um período de validade razoável (por exemplo, 90 dias). O GitHub não recomenda definir como permanente; a política da organização pode até bloquear tokens permanentes .
+    * **Resource owner**: Selecione o proprietário do repositório privado de destino (sua conta pessoal ou a organização correspondente).
+    * **Repository access**: Selecione Only select repositories e, na lista suspensa, marque apenas aquele repositório privado de documentos que o agente precisa acessar. Não selecione "All repositories".
+        <div align="left"> <img width="600" title="gh12" src="./img/gh12.png"/> </div><br>
+    * **Permissions**: Expanda Repository permissions, encontre Contents e defina como Read and write (o agente precisa fazer commit de alterações no repositório de documentos) . Se você não tiver certeza sobre outras permissões, não conceda; a abordagem de permissões mínimas é a mais segura.
+        <div align="left">
+          <img width="600" title="gh13" src="./img/gh13.png" style="margin-right: 50px;"/>
+          <img width="600" title="gh14" src="./img/gh14.png"/>
+        </div><br>
 
+**Injetando o Token no Conteriner Hermes**
+Não é preciso fazer login interativo com gh auth login dentro do contêiner. A documentação oficial do GitHub CLI afirma claramente que, para uso em automação/headless, recomenda-se usar diretamente a variável de ambiente GH_TOKEN.
 
+1. No painel do Dokploy, entre na aplicação do tipo Docker Compose do Hermes.
+2. Encontre a seção Environment.
+3. Adicione uma variável de ambiente:
+    `GH_TOKEN=Cole o token que você acabou de copiar`
+    <div align="left"> <img width="600" title="gh15" src="./img/gh15.png"/> </div><br>
+4. Salve e faça Deploy do serviço. Após a reinicialização do contêiner, o processo gh lerá automaticamente o GH_TOKEN do ambiente para completar a autenticação.
+<br>
 
-
-Para gerar um token de acesso no GitHub, siga os seguintes passos:
-> tutorial de referência [video](https://youtu.be/rbXukLLzQcQ?si=c-TaT1uK4VNM4dW2)
-
-2. Clique na sua foto do perfil no canto superior direito da página e selecione "Settings" (Configurações) no menu suspenso.
-3. Na barra lateral esquerda, clique em "Developer settings" (Configurações de desenvolvedor) e, em seguida, selecione "Personal access tokens" (Tokens de acesso pessoais).
-<div align="left"> <img width="600" title="gh11" src="./img/gh11.png"/> </div><br>
-
-4. Clique no botão "Generate new token" (Gerar novo token).
-5. Dê um nome descritivo ao token no campo "Note" (Nota).
-6. Selecione as permissões necessárias para o token na seção "Select scopes" (Selecionar escopos). As permissões determinam quais ações podem ser realizadas com o token.
-7. Clique no botão "Generate token" (Gerar token) na parte inferior da página.
-8. O token de acesso será gerado e exibido na tela. Copie o token e guarde-o em um local seguro. Lembre-se de que, por motivos de segurança, o token só é exibido uma vez e não pode ser recuperado posteriormente.
-9. Use o token em suas aplicações ou scripts como uma forma de autenticação com a API do GitHub. O token deve ser enviado em uma solicitação HTTP no cabeçalho Authorization com o valor Bearer, seguido do token. Por exemplo:
-
-
-
-Clique em Deploy. O Dokploy vai fazer o git clone do repositório, encontrar o Dockerfile, construir a imagem com o gh e iniciar o contêiner.
-
-
-No painel do Dokploy, vá em Environment.
-
-Adicione uma variável GH_TOKEN com o valor do seu token (gerado no GitHub com escopos repo, read:org, gist).
-
-No seu docker-compose.yml, descomente a linha GH_TOKEN: ${GH_TOKEN} na seção environment.
-
-Faça o redeploy.
-
-O gh reconhece automaticamente a variável GH_TOKEN e a utilizará para autenticação, sem precisar de login interativo .
-
-
-
-
-
-
-
-
-
-
----
----
-
-**Passo 4: Autenticar o GitHub**
-Após a instalação, você precisa fazer login no GitHub para que o gh funcione. A documentação oficial do GitHub recomenda executar:
-
-```bash
-gh auth login
-```
-Agora é só siga as instruções interativas se estiver em um ambiente grafico.
-Se for um ambiente de servidor sem interface, podemos escolher o **método de autenticação com Token** (ou seja, configurar a variável de ambiente GH_TOKEN ou GITHUB_TOKEN), evitando a complexidade do fluxo interativo.
-Dois pontos importantes em relação como fazer o apontamento da variável de ambiente GH_TOKEN:
-- Podemos usar o backend Docker do próprio Hermes, e neste caso, pode encaminhar GITHUB_TOKEN para o contêiner através de docker_forward_env.
-- Mas e estamos utilizando a imagem derivada, pode configurar diretamente a variável de ambiente GH_TOKEN no proprio Dokploy, e o gh dentro do contêiner a lerá automaticamente, sem necessidade de login interativo, sendo mais efetivo.
-
-**Passo 5: Verificação**
-Independentemente da solução escolhida, após a conclusão, execute dentro do contêiner Hermes:
-
+##### **Passo 6: Verificar a Autenticação**
+1. Entre no contêiner Hermes (via terminal do Dokploy ou `docker exec -it <nome_do_contêiner> /bin/bash`) e execute:
 ```bash
 gh auth status
 ```
-Se ambos os comandos retornarem resultados normais, a instalação e a autenticação estarão concluídas.
+Saída esperada:
+```bash
+github.com
+  ✓ Logged in to github.com account Cpharles (GH_TOKEN)
+  - Active account: true
+  - Git operations protocol: https
+  - Token: github_pat_************************************
+```
+
+2. A saída esperada mostrará que a autenticação foi bem-sucedida e indicará o escopo do token. Em seguida, você pode verificar o acesso ao repositório privado com:
+```bash
+gh repo view <proprietário>/<nome_do_repositório_privado>
+```
+Saída esperada:
+```bash
+Cpharles/<nome_do_repositório_privado>
+Controle e gestão de documentos.... 
+
+View this repository on GitHub: https://github.com/Cpharles/<nome_do_repositório_privado>
+```
+Se as informações do repositório forem exibidas normalmente, o gh está pronto para operar o repositório de documentos.
 
 > [!NOTE]
 > **Dúvidas**
@@ -405,7 +400,7 @@ Por que não perdemos que já fizamos com a reconstrução de uma imagem derivad
  Reconstruir a imagem derivada não causará perda dos dados do agente. A chave está em: os dados de estado do Hermes (configuração, memórias, sessões, habilidades, etc.) não são armazenados na camada da imagem, mas sim no volume persistente /opt/data (linux). A reconstrução da imagem só substitui a árvore de código em /opt/hermes; o volume de dados é preservado durante a recriação do contêiner.
  A imagem em si é somente leitura e imutável (/opt/hermes pertence ao root, e o usuário de execução não pode modificá-la). A reconstrução da imagem derivada só altera a camada do sistema onde o gh está instalado; não afeta o /opt/data.
 
-<br>
+---
 
 ## Visão geral das próximas etapas
 
