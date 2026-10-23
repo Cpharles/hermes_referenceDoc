@@ -130,72 +130,7 @@ Temos dois caminhos para acordar os bots:
 
     3. Note que a janela de chat deste bot é carregada, então finalize clicando no botão `START`
 
----
-
-## 2. CONFIGURANDO OS PROFILES NO HERMES
-
-### Step 1. Criando Profiles Hermes
-
-Quando fazemos a instalação do Hermes Agent obrigatoriamente temos que configurar um **profile default** que é a primeira solicitação do Hermes. Seguindo o passo a passo fornecido pelo instalador, vamos receber algumas perguntas de confirmações e fornecer algumas informações.
-Caso vc já tenha instalado e tenha vários profiles, não é necessário desistalar, apenas escolha qual dos profiles e de preferencia o primeiro que foi criado para ser **definido como agente default**. E porque dissso?; Simplesmente poque o primeiro profile criado que é chamado de default cria toda a sua estrutura de pastas na raiz do Hermes, e consequentemente este profile poderá ser utilizado como (clone) base para criação de outros profiles.</br>
-Para saber a insformação do seu profile default vamos executar:
-
-1. Abra o terminal **Git Bash** (obs. 1) ou o terminal CLI local do seu VPS na seção do Hermes.
-    (obs. 1) - para acessar o terminal Git Bash é necessário ter o [Git instalado](https://git-scm.com/install/windows).
-2. Execute o seguinte comando no terminal:
-
-    ```bash
-    hermes profile list
-    ```
-
-    Podemos verificar que temos inicialmente somente o profile padrão que é chamado de **default**. Este profile é criado na primeira vez que você instala o Hermes Agent.
-
-    ![status1](./img/status_profile1.png)
-    </br>
-
-    Nosso objetivo é no final da configuração dos profiles termos uma estrutura:
-
-    ```text
-                 default
-                    │
-            ~/AppData/Local/hermes/
-                    │
-            ┌───────┴────────┐
-            │                │
-          GLOBAL          profiles/
-            │                │
-            │                ├───────────────────────────┬────────────┬...
-         default          Agente1/                    Agente2/
-            │                │                           │
-          .env             .env                        .env
-       config.yaml      config.yaml                 config.yaml
-         SOUL.md          SOUL.md                     SOUL.md
-            │                 │                           │
-            │              Telegram                    Telegram
-            │                 │                           │
-            ▼                 ▼                           ▼
-        gateway run       gateway run                 gateway run
-            │                 │                           │
-            ▼                 ▼                           ▼
-          running          running                     running
-    ```
-
-### Step 2. Definindo o tipo de protocolo do gateway
-
-Antes de criarmos os profiles de cada agente dentro do Hermes, temos que entender a diferença entre o protoloco **gateway single-channel e multiplex**.
-Para uma aplicação de automação com conectores (chamado também de **Plataformas**) que tem ação externa e portanto vão ter request via API, o **gateway com protocolo single channel** atende perfeitamente quando temos apenas um agente interagindo (fazendo request) com a plataforma, mas quando vamos trabalhar com multiplos agentes, e estes agentes também vão fazer request para a mesma plataforma, neste caso o ideal é utilizar o **gateway com protocolo multiplex**.
-É justamente o nosso caso, pois estaremos utilizando a plataforma Telegram para fazer a interação com multiplos agentes.
-Vamos pausar um pouco aqui e seguir em outro documento, onde temos a explicação da diferença entre os protocolos e como implantar **gateway multiplexado**.
-
-:books: ⇒ Abra o arquivo [config_gw_multiplex.md](config_gw_multiplex.md)</br>
-
-Caso a sua aplicação tenha apenas um **único agente** interagindo com a plataforma, o recomendado é utilizar o **gateway single-channel protocol**, neste caso siga as instruções em:
-
-:books: ⇒ Abra o arquivo [config_newprofile.md](config_newprofile.md)
-
----
-
-## 3. Organizar a empresa no Telegram
+## 2. Organizar a empresa no Telegram
 
 Os próximos passos compreende em organizar dentro do Telegram a estrutura da empresa e facilitar o acompanhamento do processo de trabalho dos grupos, portanto se você já tem experiência com este tipo de organização no Telegram, sinta-se a vontade para organizar da melhor forma ou siga os próximos passos para replicar a lógica da minha organização.
 Então vamos organizar a estrutura da nossa empresa dentro do Telegram onde teremos uma pasta da empresa, um grupo por time, e o bot do agente dentro de cada grupo.
@@ -274,7 +209,10 @@ Vamos criar um grupo pra cada setor da empresa: Performance, SAC, Comercial, Con
 
 9. Repita todos os passos anteriores para fazer o mesmo para os outros agentes.
 
-## 4. Colocando em Operação
+## 3. Colocando em Operação
+
+> [!WARNING]
+> Antes de colocar em operação certifique de ter criado os profiles e que os mesmos estejam funcionando ou execute as etapas em: [config_newprofile.md](config_newprofile.md)
 
 ### Testando a comunicação
 

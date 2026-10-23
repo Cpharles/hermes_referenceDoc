@@ -1,0 +1,31 @@
+services:
+  hermes:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: nousresearch/hermes-agent:v0.22.5
+    restart: unless-stopped
+    command: gateway run
+    ports:
+      - "9119:9119"   # Dashboard (acesso local via navegador)
+      - "8642:8642"   # Gateway API (opcional, para clientes externos)
+    environment:
+      - HERMES_DASHBOARD=${HERMES_DASHBOARD}
+      - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${HERMES_DASHBOARD_BASIC_AUTH_USERNAME}
+      - HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD}
+      - HERMES_DASHBOARD_BASIC_AUTH_SECRET=${HERMES_DASHBOARD_BASIC_AUTH_SECRET}
+      - API_SERVER_ENABLED=${API_SERVER_ENABLED}
+      - API_SERVER_HOST=${API_SERVER_HOST}
+      - API_SERVER_KEY=${API_SERVER_KEY}
+      # - GH_TOKEN=${GH_TOKEN}   # Opcional, caso use token do GitHub
+    volumes:
+      - hermes_data:/opt/data
+      - /mnt/vbox_global:/shared_data # compartilhamento da pasta global (somente para aplicação homelab local)
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: "2.0"
+
+volumes:
+  hermes_data:

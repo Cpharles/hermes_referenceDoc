@@ -15,7 +15,6 @@ Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto d
 > ➩ Configurando a Identidade e a Descrição dos Profiles: [profile_identity_describe.md](profile_identity_describe.md) <br>
 > ➩ Configurando memória persistente: Em breve.
 
-
 > **Documentação Oficial:**
     - Pagina oficial do projeto no GitHub: [Hermes-Agent](https://github.com/NousResearch/hermes-agent)<br>
     - Recomendo consultar a documentação oficial do Hermes Agent: [Docs](https://hermes-agent.nousresearch.com/docs)
