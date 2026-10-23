@@ -270,7 +270,7 @@ services:
       - "9119:9119"   # Dashboard (acesso local via navegador)
       - "8642:8642"   # Gateway API (acesso para clientes externos)
     environment:
-      #- GH_TOKEN=${GH_TOKEN}   # Opcional, caso use token do GitHub
+      - GH_TOKEN=${GH_TOKEN}   # para usar no GitHub CLI
       ...
       <continua...>
     # ... outras configurações (redes, portas, etc.) que você já tinha
@@ -284,6 +284,8 @@ O que mudou e por quê:
 > Para o apontamento da **variável de ambiente** para o **GT_TOKEN**, registramos na opção **Enviroment** dentro do aplicativo no Dokploy:
 
 **Passo 4: Configurar o apontamento dos arquivos no Dokploy**
+> tutorial de referência [video](https://www.youtube.com/watch?v=j9r2mdzBZcQ)
+
 Ainda dentro da aplicação e na seção **Geral** vamos fornecer o **Provider** para o Compose File, neste caso vamos optar por **GitHub**
 <div align="left"> <img width="600" title="gh1" src="./img/gh1.png"/> </div>
    
@@ -300,50 +302,79 @@ Caso não esteja conectado a sua conta irá aparecer a opção de loging ou caso
 <div align="left">
   <img width="300" title="gh5" src="./img/gh5.png" style="margin-right: 50px;"/>
   <img width="270" title="gh6" src="./img/gh6.png"/>
-</div>
+</div><br>
 
 Aqui podemos dar um nome para identificarmos esta conecção, por padrão o Dokploy gera um aleatoriamente, depois confirme em **Create GitHub App...**
 ![gh7](./img/gh7.png)
 
 Retornamos para o Dokploy e agora podemos ver que temos a conecção e uma **Action Required**, vamos clicar no botão indicado para carregarmos a conecção. Uma nova tela **Install & Authorize** será apresentada. Vamo marcar a opção **only select repositories** e será apresentado um droplist com os repositórios do seu GitHub, selecione o repo do seu projeto ou o que tem os arquivos docker-compose file da nossa aplicação e finalize confirmando no botão de "Install & Authorize"
 <div align="left">
-  <img width="600" title="gh8" src="./img/gh8.png" style="margin-right: 50px;"/>
+  <img width="600" title="gh8" src="./img/gh8.png" style="margin-right: 50px; vertical-align: top;"/>
   <img width="270" title="gh9" src="./img/gh9.png"/>
 </div>
 
-Agora vamos retornar para o nosso projeto em "Projct" no menu do lado esquerdo, clique no projeto e entre no serviço do aplicativo, role até a área do "Provider", selecione novamente a opão GitHub e poderemos notar que agora temos um **GitHub Account**, vamos prencher os campos. Para o "Compose Path", coloque o caminho onde esta os arquivos docker-compose dentro do repo, no meu caso eu criei uma pasta "docker".
-<div align="left"> <img width="600" title="gh10" src="./img/gh10.png"/> </div>
+Agora vamos retornar para o nosso projeto em "Projct" no menu do lado esquerdo, clique no projeto e entre no serviço do aplicativo, role até a área do "Provider", selecione novamente a opão GitHub e poderemos notar que agora temos um **GitHub Account**, vamos prencher os campos. Para o "Compose Path", coloque o caminho onde esta os arquivos docker-compose dentro do repo, no meu caso eu criei uma pasta "docker". Finalize **Salvando o Provider**.
+<div align="left"> <img width="600" title="gh10" src="./img/gh10.png"/> </div><br>
+
+> [!NOTE]
+> A configuração explicada até este ponto, foi para disponibilizar acesso ao Dokploy a um repositório específico no GitHub para fazer a clonagem dos arquivos do docker-compose file.
+
+**Passo 5: Permissão de Gerenciamento do Versionamento e Fazer o Deploy**
+Para darmos acesso ao nosso agente para gerenciar o sistema de versionamento montado no GitHub, vamos precisar autenticar (permitir) que o GitHub CLI tenha acesso ao GitHub pelo agente para executar comandos de versionamento. Como nosso ambiente é headless (sem navegador ou seja um servidor), a forma mais recomendada é usar um **Personal Access Token (PAT)** através da variável de ambiente GH_TOKEN inserido no "**Enviroment**" do Dokploy.
+Para este projeto estarei criando um novo repositório privado, por se tratar de documentação versionada de acesso restrito ao projeto.
+
+**Criando GitHub App**
+1. Faça login na sua conta do GitHub
+2. Clique na sua foto do perfil no canto superior direito da página e selecione "**Settings**" (Configurações) no menu suspenso.
+3. Na barra lateral esquerda, clique em "**Developer settings**" (Configurações de desenvolvedor) e, em seguida, clique em **New GitHub App**
+4. Preencher os campos:
+    1. GitHub App name
+    2. Homepage URL: fornecer a URL de acesso a API do Hermes, por padrão esta na **porta 8642**, portanto fica `https://<URL_Servidor>:8642`
+    3. Redirect URI: fornecer uma URL de 
+
+
+
+
+Para gerar um token de acesso no GitHub, siga os seguintes passos:
+> tutorial de referência [video](https://youtu.be/rbXukLLzQcQ?si=c-TaT1uK4VNM4dW2)
+
+2. Clique na sua foto do perfil no canto superior direito da página e selecione "Settings" (Configurações) no menu suspenso.
+3. Na barra lateral esquerda, clique em "Developer settings" (Configurações de desenvolvedor) e, em seguida, selecione "Personal access tokens" (Tokens de acesso pessoais).
+<div align="left"> <img width="600" title="gh11" src="./img/gh11.png"/> </div><br>
+
+4. Clique no botão "Generate new token" (Gerar novo token).
+5. Dê um nome descritivo ao token no campo "Note" (Nota).
+6. Selecione as permissões necessárias para o token na seção "Select scopes" (Selecionar escopos). As permissões determinam quais ações podem ser realizadas com o token.
+7. Clique no botão "Generate token" (Gerar token) na parte inferior da página.
+8. O token de acesso será gerado e exibido na tela. Copie o token e guarde-o em um local seguro. Lembre-se de que, por motivos de segurança, o token só é exibido uma vez e não pode ser recuperado posteriormente.
+9. Use o token em suas aplicações ou scripts como uma forma de autenticação com a API do GitHub. O token deve ser enviado em uma solicitação HTTP no cabeçalho Authorization com o valor Bearer, seguido do token. Por exemplo:
+
+
+
+Clique em Deploy. O Dokploy vai fazer o git clone do repositório, encontrar o Dockerfile, construir a imagem com o gh e iniciar o contêiner.
+
+
+No painel do Dokploy, vá em Environment.
+
+Adicione uma variável GH_TOKEN com o valor do seu token (gerado no GitHub com escopos repo, read:org, gist).
+
+No seu docker-compose.yml, descomente a linha GH_TOKEN: ${GH_TOKEN} na seção environment.
+
+Faça o redeploy.
+
+O gh reconhece automaticamente a variável GH_TOKEN e a utilizará para autenticação, sem precisar de login interativo .
 
 
 
 
 
 
-Salve.
 
 
 
 
-
-
-
-
-
-
-
-
-**Passo 2: Construir a imagem no host Ubuntu**
-```bash
-cd /root/hermes-gh
-docker build -t hermes-agent-gh:latest .
-```
-
-**Passo 3: Modificar a imagem no Dokploy**
-
-No painel do Dokploy, encontre o serviço Hermes, altere a configuração da imagem de **nousresearch/hermes-agent:latest** para **hermes-agent-gh:latest** (ou o nome/tag da imagem que você construiu), e então faça o **redeploy**.
-
-> [!WARNING]
-> Toda vez que a imagem oficial do Hermes for atualizada, você precisará reconstruir sua imagem derivada.
+---
+---
 
 **Passo 4: Autenticar o GitHub**
 Após a instalação, você precisa fazer login no GitHub para que o gh funcione. A documentação oficial do GitHub recomenda executar:

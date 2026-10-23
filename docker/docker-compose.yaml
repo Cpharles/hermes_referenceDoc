@@ -17,7 +17,7 @@ services:
       - API_SERVER_ENABLED=${API_SERVER_ENABLED}
       - API_SERVER_HOST=${API_SERVER_HOST}
       - API_SERVER_KEY=${API_SERVER_KEY}
-      # - GH_TOKEN=${GH_TOKEN}   # Opcional, caso use token do GitHub
+      - GH_TOKEN=${GH_TOKEN}   # para usar no GitHub CLI
     volumes:
       - hermes_data:/opt/data
       - /mnt/vbox_global:/shared_data # compartilhamento da pasta global (somente para aplicação homelab local)
