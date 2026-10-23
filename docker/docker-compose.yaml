@@ -2,7 +2,7 @@ services:
   hermes:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: hermes-gh.Dockerfile
     # image: nousresearch/hermes-agent:v0.22.5
     restart: unless-stopped
     command: gateway run
