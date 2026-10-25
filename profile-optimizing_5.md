@@ -1,13 +1,9 @@
 # Otimizar um profile no Hermes Agent pra Produção
 
 ## Conteúdo
+<!-- toc -->
 
-1. 
-2. 
-3. 
-
-
-## Introdução
+## 1. Introdução
 
 Após a configuração inicial do profile abordado em [configurando um novo profile](config_newprofile_2.md) onde foi definindo o tipo de **model, describe e SOUL**, a próxima etapa é transformar o profile em um agente operacional com:
 
@@ -60,9 +56,9 @@ adm-docs/
   evaluations/     # casos de avaliação e resultados
 ```
 
-### 4 Criando o Workspace
+## 2. Criando o Workspace
 
-#### 4.1 Visão Geral do Terminal Backend
+### 1 Visão Geral do Terminal Backend
 ([link_doc](https://hermes-agent.nousresearch.com/docs/user-guide/configuration#terminal-backend-configuration))
 
 *Terminal Backend Configuration* apresenta os backends disponíveis para definir onde os comandos de shell do agente realmente são executados. A tabela oficial lista **seis backends nativos** (*local, docker, ssh, modal, daytona, vercel_sandbox*) e a seção **Singularity/Apptainer** como backend de plugin (oficial), totalizando **sete abordagens** distintas. Segue a descrição prática de quando usar cada uma.
@@ -117,7 +113,7 @@ Pelo Dashboard acesse:
 **Onde roda:** contêiner Singularity/Apptainer com `--containall --no-home`.
 **Quando usar:** clusters HPC e máquinas compartilhadas onde Docker **não está disponível**. É um plugin oficial (instale com `hermes plugins install singularity`) e requer `apptainer` ou `singularity` no `$PATH`. Usa diretório scratch típico de HPC (`/scratch/$USER/...`) e converte imagens `docker://` para SIF em cache.
 
-#### 4.2 Regra prática de escolha
+### 2 Regra prática de escolha
 | Objetivo | Terminal Backend |
 |---|---|
 | Confiança total / simplicidade | `local` |
@@ -133,7 +129,7 @@ Pelo Dashboard acesse:
 
 **Obs.**: Para uma configuração inicial, vamos iniciar pela *opção 1* com execução *"Local"* e depois migramos para a opção 2 que seria em um ambiente controlado por docker.
 
-#### 4.3 Apontamento do Diretorio para nosso Workspace
+### 3 Apontamento do Diretorio para nosso Workspace
 Podemos executar via CLI ou configurar via dashboard
 por CLI:
 
@@ -150,7 +146,7 @@ por dashboard:
 
 <br>
 
-### 5. Versionamento de Documentos
+## 3. Versionamento de Documentos
 Para esta etapa é extremamente importante mantermos e definirmos um fluxo de versão e revisão para cada documento que deve ser registrar:
 
  - autor/revisor,
@@ -181,7 +177,7 @@ E para garantir este fluxo vamos adotar o seguinte critério inicial:
 2. Para o controle do vercionamento vamos utilizar um *repositório no GitHub*, mas exigindo aprovação antes de publicar, substituir a versão vigente ou mudar o estado para “aprovado” antes do "pull request".
 <br>
 
-#### 5.1 Recurso exigido
+### 1. Recurso exigido
 Temos que verificar se já temos instalado em nosso sistema o *git* e o *GitHub CLI*
 
 ```bash
@@ -197,7 +193,7 @@ gh --version    # verifica a existência do gh cli
 
 <br>
 
-#### 5.2 Instando GitHub CLI para o Hermes dentro do conteiner
+### 2 Instando GitHub CLI para o Hermes dentro do conteiner
 
 O cenário que temos é (**VM Ubuntu → Dokploy → contêiner Hermes**), para instalarmos o GitHub CLI dentro do contêiner Hermes podemos fazer de duas formas:
 
@@ -210,7 +206,7 @@ Na opção 1 basicamente é recriar a imagem com uma alteração, mas de forma m
 Agora para deixarmos de forma automática, podemos incluir a instrução **build:** no arquivo docker-compose. Portanto vamos escolher a opção 2.
 <br>
 
-##### **Passo 1: Escrever o Dockerfile**
+#### Passo 1: Escrever o Dockerfile
 Crie um arquivo`Dockerfile` sem extenção :
 - O método de instalação do gh acima segue o procedimento padrão do repositório oficial do GitHub CLI para **Ubuntu/Debian**, e também há precedentes na base de código do próprio Hermes de instalação do gh na camada apt da imagem base.
 - Conteúdo do Dockerfile (baseado na documentação oficial do GitHub CLI )
@@ -238,7 +234,7 @@ USER hermes
 ```
 <br>
 
-##### **Passo 2: Preparar os arquivos no repositório Git**
+#### Passo 2: Preparar os arquivos no repositório Git
 Vamos criar um repositório, caso ainda não tenha, para que o Dokploy utilize para fazer a leitura dos arquivos. Vamos precisar ter dois arquivos na raiz do repo (ou no caminho que você define como Compose Path):
 
 > **Dockerfile**: O arquivo que instala o gh.
@@ -247,7 +243,7 @@ Vamos criar um repositório, caso ainda não tenha, para que o Dokploy utilize p
 
 <br>
 
-##### **Passo 3: Configurar o docker-compose.yml no Dokploy**
+#### Passo 3: Configurar o docker-compose.yml no Dokploy
 Aqui está o ponto crucial. O Dokploy limpa o diretório do repositório a cada deploy (AutoDeploy). Isso significa que você não pode usar bind mounts com caminhos relativos do repositório (ex: ./config:/opt/data) para dados persistentes, pois eles serão perdidos.
 Vamos alterar o no arquivo dentro do Dokploy, e o docker-compose.yml deve iniciar assim:
 
@@ -292,7 +288,7 @@ O que mudou e por quê:
 
 <br>
 
-##### **Passo 4: Configurar o apontamento dos arquivos no Dokploy**
+#### Passo 4: Configurar o apontamento dos arquivos no Dokploy
 > tutorial de referência [video](https://www.youtube.com/watch?v=j9r2mdzBZcQ)
 
 Ainda dentro da aplicação e na seção **Geral** vamos fornecer o **Provider** para o Compose File, neste caso vamos optar por **GitHub**
@@ -330,7 +326,7 @@ Agora vamos retornar para o nosso projeto em "Project" no menu do lado esquerdo,
 
 <br>
 
-##### **Passo 5: Permissão de Gerenciamento do Versionamento e Fazer o Deploy**
+#### Passo 5: Permissão de Gerenciamento do Versionamento no GitHub
 Para darmos acesso ao nosso agente para gerenciar o sistema de versionamento montado no GitHub, vamos precisar autenticar (permitir) que o GitHub CLI tenha acesso ao GitHub pelo agente para executar comandos de versionamento. Como nosso ambiente é headless (sem navegador ou seja um servidor), a forma mais recomendada é usar um **Personal Access Token (PAT)** através da variável de ambiente GH_TOKEN inserido no "**Enviroment**" do Dokploy.
 Para este projeto estarei criando um novo repositório privado, por se tratar de documentação versionada de acesso restrito ao projeto.
 
@@ -364,7 +360,7 @@ Não é preciso fazer login interativo com gh auth login dentro do contêiner. A
 4. Salve e faça Deploy do serviço. Após a reinicialização do contêiner, o processo gh lerá automaticamente o GH_TOKEN do ambiente para completar a autenticação.
 <br>
 
-##### **Passo 6: Verificar a Autenticação**
+#### Passo 6: Verificar a Autenticação
 1. Entre no contêiner Hermes (via terminal do Dokploy ou `docker exec -it <nome_do_contêiner> /bin/bash`) e execute:
 ```bash
 gh auth status
@@ -402,7 +398,7 @@ Por que não perdemos que já fizamos com a reconstrução de uma imagem derivad
 
 ---
 
-## Visão geral das próximas etapas
+## 4. Visão Geral das Próximas Etapas
 
 ![nextstep1](./img/nextstep1.png)
 
@@ -410,7 +406,7 @@ Vamos seguir uma sequência de *implementação* e *validação*, em vez de inst
 
 1. **Configurar as ferramentas (tools)**
     Definir o que o agente pode executar, consultar, criar ou modificar.
-    [ ] Provider e Modelo validados
+    [ ] Provider (router de modelos) e Modelo validados
     [ ] Describe e SOUL.md revisados
     [ ] Ferramentas necessárias habilitadas
 
@@ -443,45 +439,101 @@ Vamos seguir uma sequência de *implementação* e *validação*, em vez de inst
 
 ---
 
-## 1. Configurar as ferramentas (tools)
+## 5. Configurar as ferramentas (tools)
 
-O `SOUL.md` define como o agente deve se comportar, mas as ferramentas determinam o que ele consegue fazer de fato.
-
+O `SOUL.md` define como o agente deve se comportar, mas as **ferramentas** (Tools) determinam o que ele consegue fazer de fato.
 O Hermes disponibiliza ferramentas agrupadas por categorias, que podem ser habilitadas conforme a função do agente.
+
+### 5.1 Estruturando as ferramentas para cada Agente
+
+1. Liste as ferramentas disponíveis de um profile.
+2. Habilite somente as ferramentas relevantes para a função do profile.
+3. Desabilite ferramentas redundantes ou que não serão utilizadas. Podemos fazer esta configuração no Dashboard
+4. Teste cada ferramenta individualmente antes de permitir fluxos autônomos.
+
+> [!WARNING]
+> Critério de otimização: não habilite todas as ferramentas apenas porque estão disponíveis. Muitas ferramentas aumentam o contexto enviado ao modelo e podem dificultar a seleção da ação correta. A própria documentação recomenda reduzir toolsets e skills desnecessários para diminuir o tamanho do prompt.
+
+Para listarmos e configurarmos as Tools podemos acessar via Dashboard ou pelo terminal (pelo terminal o setup será para o profile ativo)
+No Dashboard
+<div align="left">
+  <img width="800" title="tools1" src="./img/tools1.png"/>
+</div><br>
+
+No terminal temos:
+```bash
+hermes --profile <profile_name> tools
+hermes -p <perfil> tools --summary
+```
+Saída esperada:
+<div align="left">
+  <img width="500" title="tools2" src="./img/tools2.png" style="margin-right: 50px; vertical-align: top;"/>
+  <img width="600" title="tools3" src="./img/tools3.png"/>
+</div><br>
+
+### 5.2 Selecionando Tools
+
+Vamos começar com **pesquisa de fontes, leitura de arquivos e terminal com diretório** de trabalho restrito ao workspace.
+Adicione navegador apenas para páginas dinâmicas ou quando extração textual falhar.
 
 | Categoria                     | Aplicação                                                                           |
 | ----------------------------- | ----------------------------------------------------------------------------------- |
-| Web search e extração         | Pesquisar fontes, validar informações e consultar documentação atualizada.          |
-| Arquivos                      | Ler documentos, analisar dados e produzir arquivos.                                 |
-| Terminal e execução de código | Executar scripts, automatizar tarefas e processar dados.                            |
-| Memória                       | Recuperar informações persistentes entre sessões.                                   |
-| Delegação                     | Encaminhar tarefas específicas para outros agentes, quando suportado e configurado. |
+| Web Search & Scraping         | Pesquisar fontes, validar informações e consultar documentação atualizada.          |
+| File Operations               | Ler documentos, analisar dados e produzir arquivos.                                 |
+| Terminal & Processes e Code Execution | Executar scripts, automatizar tarefas e processar dados.                    |
+| Memory                        | Recuperar informações persistentes entre sessões.                                   |
+| Task Delegation               | Encaminhar tarefas específicas para outros agentes, quando suportado e configurado. |
 | MCP e integrações             | Conectar APIs, repositórios, bancos de dados e sistemas externos.                   |
 
-## Como otimizar
+Use a interface de `hermes tools` para selecionar o necessário e conferir o resumo. Os nomes e opções exatos de toolsets podem depender dos backends instalados. Para busca, a documentação corrente descreve escolha de backend via ferramenta `hermes tools` ou chaves `web.backend`, `web.search_backend` e `web.extract_backend`; exige credencial ou serviço suportado. Não presuma que adicionar uma chave à `.env` troca um backend já selecionado.
 
-1. Liste as ferramentas disponíveis no seu ambiente.
-2. Habilite somente as ferramentas relevantes para a função do profile.
-3. Desabilite ferramentas redundantes ou que não serão utilizadas.
-4. Teste cada ferramenta individualmente antes de permitir fluxos autônomos.
+**Exemplo ilustrativo de configuração YAML** (escolha um backend realmente configurado; a sintaxe das chaves é documentada):
 
-Comandos para começar a inspecionar a instalação:
-
-```
-hermes tools
-hermes config show
-hermes skills list
+```yaml
+web:
+  search_backend: "<backend-de-busca>"
+  extract_backend: "<backend-de-extração>"
+  extract_char_limit: 30000
 ```
 
-Consulte `hermes <comando> --help` se algum subcomando diferir na versão instalada.
+> [!WARNING]
+> O limite padrão de extração documentado é 15.000 caracteres, ajustável em `web.extract_char_limit` (faixa documentada de 2.000–500.000). Aumente somente quando necessário; para conteúdo truncado, siga a indicação do Hermes para ler o texto completo salvo localmente.
 
-Critério de otimização: não habilite todas as ferramentas apenas porque estão disponíveis. Muitas ferramentas aumentam o contexto enviado ao modelo e podem dificultar a seleção da ação correta. A própria documentação recomenda reduzir toolsets e skills desnecessários para diminuir o tamanho do prompt.
+Valide com uma tarefa de baixo risco: buscar uma diretriz pública sobre um tema delimitado, abrir a página primária e extrair o texto. Exija título, instituição/autores, data, URL, trecho de apoio e distinção entre fonte primária e resumo secundário. Não trate um resultado do buscador como evidência suficiente.
+
+Fontes preferenciais para instruir o método de pesquisa: periódicos revisados por pares, PubMed/PMC, CAB Abstracts (se licenciado), repositórios institucionais e órgãos reguladores pertinentes à jurisdição (por exemplo, MAPA/Anvisa no Brasil, FDA/USDA nos EUA, EMA na UE). Disponibilidade de APIs e acesso a bases pagas não são presumidos.
 
 ---
 
-## 2. Configurar a memória do agente
+## 6. Fornecendo Memória ao Agente
 
 A memória é o que permite preservar informações úteis entre sessões. Ela não deve ser tratada como um depósito indiscriminado de todas as conversas.
+Temos que entender que a memória está em três camadas de empilhamento
+<div align="left">
+  <img width="700" title="memory2" src="./img/memory2.png"/>
+</div><br>
+
+Quando falamos no **conhecimrnto real das coisa/mundo** (world knowledge), não podemos afirmar e nem definir que o conhecimento é uma **Memoria Operacional**. Mas por que?
+<div align="left">
+  <img width="700" title="memory3" src="./img/memory3.png"/>
+</div><br>
+
+Porque na **Memória Operacional** o agente é direcionado à lembrar como trabalhar para nós através de tomadas ações e decisões com o contexto corrente, sendo assim, temos que separar a memória operacional em mais dois níveis: **Memória Integrada** (Built-in memory) e os **Provedores de Memória Dedicados** (Provider memory)
+Para entendermos estas duas memórias vamos ver a arquitetura de uma Memória Operacional
+<div align="left">
+  <img width="500" title="memory4" src="./img/memory4.png"/>
+</div><br>
+
+Resumindo de uma forma simples:
+- Na camada de conhecimento (world knowledge como o Obsidian) é usado para construir o conhecimento de mundo que abrange cada projeto e agente que nós executamos; 
+- Na camada da memória integrada (built-in Memory) é ótimas para chat simples de seção única;
+- Na camada dos provedores de memória (provider memory) é ótimos para projetos complexos e fluxos continuos ou quando queremos um desempenho visivelmente melhor na recuperação do agente.
+
+> [!TIP]
+> Como a camada de conhecimento (world knowledge) tem um nível de complexidade maior, deixaremos para abordado em uma tese a parte.
+
+### 6.1 Conceito de Memória Integrativa Vs Provedor de Memória
+Vamos conceituar primeiramente a Memória Integrada (built-in memory) que já vem por padrão no Hermes 
 A ideia aqui é separar conceitualmente três tipos de informação: |
 
 | Tipo de Informação |
@@ -490,17 +542,17 @@ A ideia aqui é separar conceitualmente três tipos de informação: |
 **Memória de decisões** <br> Decisões anteriores, premissas adotadas, critérios definidos e razões para escolhas importantes.
 **Memória procedural** <br> Procedimentos que funcionaram, sequências de execução e soluções reutilizáveis — muitas vezes mais bem representados por Skills.
 
-### Ações recomendadas
+<div align="left">
+  <img width="700" title="memory5" src="./img/memory5.png"/>
+</div><br>
 
-- Verifique se a memória persistente e o perfil do usuário estão habilitados na configuração.
-- Defina limites de tamanho para evitar excesso de contexto.
-- Estabeleça critérios para salvar apenas informações duradouras e úteis.
-- Revise a memória periodicamente e remova informações obsoletas.
-- Considere aprovação humana para gravações de memória durante a fase inicial de testes.
+Hermes mantém memória nativa em `memories/MEMORY.md` e `memories/USER.md`, são os dois arquivos centrais da memória embutida (built-in), ou seja, as memórias proprietária do Hermes, com divisão clara de responsabilidades e **são carregadas como snapshot no início da sessão**.
+Usado para:
+- `MEMORY.md`: **Registra "o que o Agent aprendeu"** como idioma, estilo, formato de citação e preferências do usuário. O limite de caracter do documentado é de 1.375
+- `USER.md`: **Registra "quem é você"** através de convenções de documentação, público-alvo, processo de revisão, caminhos estáveis do workspace e preferências técnicas recorrentes. O limite de caracter do documentado é de 2.200
 
-No Hermes Agent, `MEMORY.md` e `USER.md` são os dois arquivos centrais da memória embutida, com divisão clara de responsabilidades: **`USER.md` registra "quem é você"**, enquanto **`MEMORY.md` registra "o que o Agent aprendeu"**.
-
-### Comparação das diferenças principais
+> [!TIP] Um ponto de observação:
+> A memória é injetada como um **snapshot congelado** no início da sessão. Isso significa que, mesmo que você ou o Agent modifiquem `MEMORY.md` ou `USER.md` durante a sessão, as alterações serão gravadas imediatamente no disco, mas **só terão efeito no system prompt da próxima nova sessão**. Se você não vir o efeito após a alteração, tente iniciar uma nova sessão (como usar `/new`) antes de verificar novamente.
 
 | Dimensão | `USER.md` (Perfil do Usuário) | `MEMORY.md` (Notas do Agent) |
 | :--- | :--- | :--- |
@@ -509,7 +561,42 @@ No Hermes Agent, `MEMORY.md` e `USER.md` são os dois arquivos centrais da memó
 | **Limite de Caracteres** | 1.375 caracteres (aproximadamente 500 tokens) | 2.200 caracteres (aproximadamente 800 tokens) |
 | **Localização** | `~/.hermes/memories/USER.md` | `~/.hermes/memories/MEMORY.md` |
 
-### Como verificar as diferenças após a aplicação
+Como sabemos que a cada sessão (chat) o agente irá carregar a memória embutida (built-in interno), consumindo partes dos token e portanto a cada conversa, consequentemente disperdisando tokens e proporcionando ao modelo uma janela de contexto menor.
+<div align="left">
+  <img width="700" title="memory6" src="./img/memory6.png"/>
+</div><br>
+
+E é ai que entra o Provedor de Memória real, que é uma camada externa que armazena e recupera fatos em tempo de execução ou quando o agente precisa entre execução, ao invés de incerir a cada conversa. Isso ajuda a manter o seu contexto enxuto e o espaço de memoria preciso para quando precisarmos dele.
+<div align="left">
+  <img width="700" title="memory7" src="./img/memory7.png"/>
+</div><br>
+
+### 6.2 Ações recomendadas
+
+- Não usar memória como repositório bibliográfico ou banco de conhecimento clínico; fatos científicos precisam de fontes atuais e verificáveis em cada documento.
+- Não guardar dados pessoais/sensíveis de pacientes, credenciais ou texto extenso de artigos.
+- Verifique se a memória persistente e o perfil do usuário estão habilitados na configuração.
+- Defina limites de tamanho para evitar excesso de contexto.
+- Estabeleça critérios para salvar apenas informações duradouras e úteis.
+- Revise a memória periodicamente e remova informações obsoletas.
+- Considere aprovação humana para gravações de memória durante a fase inicial de testes.
+
+### 6.3 Configurando a Memória
+
+**Verificando o status da memoria em um profile:**
+
+```bash
+hermes -p <perfil> memory status
+```
+
+1. Temos que verificar em Tools se a opção para **MEMORY** esta habilitada
+2. Depois no menu lateral esquerdo em **CONFIG** temos a opção **Memory**
+
+<div align="left">
+  <img width="800" title="memory1" src="./img/memory1.png"/>
+</div><br>
+
+### 6.4 Como verificar as diferenças após a aplicação
 
 Para confirmar se as alterações foram aplicadas em um Profile específico, você pode usar os seguintes métodos:
 
@@ -520,21 +607,23 @@ Para confirmar se as alterações foram aplicadas em um Profile específico, voc
     *   Execute `hermes journey list` para listar os IDs de nós da memória, que podem incluir o status de fragmentação dos arquivos de memória.
 3.  **Confirmar dentro da sessão**: Em uma nova sessão, você pode usar comandos como `/memory` (dependendo da versão) para visualizar o status da memória ou usar `/context` para verificar se o conteúdo da memória foi injetado no contexto.
 
-### Um ponto-chave a ter em mente
-
-A memória é injetada como um **snapshot congelado** no início da sessão. Isso significa que, mesmo que você ou o Agent modifiquem `MEMORY.md` ou `USER.md` durante a sessão, as alterações serão gravadas imediatamente no disco, mas **só terão efeito no system prompt da próxima nova sessão**. Se você não vir o efeito após a alteração, tente iniciar uma nova sessão (como usar `/new`) antes de verificar novamente.
-Na documentação atual, existem configurações como `memory.memory_enabled`, `memory.user_profile_enabled` e `memory.write_approval`. Os nomes e recursos devem ser conferidos na versão instalada.
-
 Teste prático: informe uma preferência não sensível ao agente, encerre a sessão, inicie outra e verifique se ele consegue recuperá-la corretamente.
+
+### 6.5 Aprimorando a Memória
+Se houver necessidade real de busca semântica entre muitas sessões, avalie um **Provedor de Memória Externo** após definir governança e localização dos dados, partrido para a execução do `hermes memory setup`.
+Os provedores de memória externos são aditivos à memória embutida/nativa (built-in interno) e somente um provedor de memória externo fica ativo por vez. Considere para um agente individual de produção documental, comece pela memória embutida (built-in) e só acrescente provedor quando houver caso de uso demonstrado.
+Ver documentação sobre ["Aprimorando a Memória em IA"](memoria-ia-hermes.md)
 
 ---
 
-## 3. Criar e selecionar Skills
+## 7. Definir, Selecionar e Criar Skills
+
+[Documentação Skills - Hermes - Oficial](https://hermes-agent.nousresearch.com/docs/reference/skills-catalog)
+[Catalogo de Skills - Hermes - Oficial](https://hermes-agent.nousresearch.com/docs/skills)
+[Catálogo de Skills - Hermes Atlas (comunidade Brasil)](https://hermesatlas.com/skills/)
 
 Esta é uma das etapas com maior potencial de melhoria operacional.
-
 Uma Skill não é apenas uma descrição da personalidade. Ela deve funcionar como um procedimento reutilizável para realizar determinada classe de tarefa.
-
 Por exemplo, para um profile de pesquisa técnica veterinária, você poderia criar:
 
 | Skill                     | Objetivo                                                             |
@@ -546,6 +635,24 @@ Por exemplo, para um profile de pesquisa técnica veterinária, você poderia cr
 | `verificacao-de-citacoes` | Conferir se as citações sustentam as afirmações correspondentes.     |
 
 Cada Skill deve ter instruções claras, critérios de entrada, etapas de execução, condições de erro e formato de saída.
+A configuração para ativar/desativar e instalar as Skills é feito somente pelo Dashboard em `SKILL -> ALL -> CATEGORIES`
+![skill](./img/skill.png)<br>
+
+Telo terminal podemos fazer consultas, verificar o status, instalar/deletar
+```bash
+hermes --profile <profile_name> skills list
+```
+Saida esperada no terminal:
+![skill1](./img/skill1.png)<br>
+
+Para facilitar podemos executar um script para ativar/desativar de forma mais rápida, similar ao script para ativação das Tools.
+Descarregue o script skill-config.mjs em uma pasta dentro do ambinete Hermes e execute:
+
+```bash
+npm run skill-config
+```
+Saida esperada durante a execução do script:
+![skill2](./img/skill2.png)<br>
 
 ### Boas práticas
 
@@ -557,7 +664,7 @@ Cada Skill deve ter instruções claras, critérios de entrada, etapas de execu�
 
 O sistema de Skills do Hermes usa carregamento progressivo de contexto: as instruções especializadas podem ser disponibilizadas quando necessárias, em vez de manter todo o conteúdo carregado o tempo inteiro.
 
-## 4. Definir regras de operação e segurança
+## 8. Definir regras de operação e segurança
 
 O `SOUL.md` deve definir a identidade e o comportamento. As instruções operacionais devem definir como o trabalho é executado.
 
@@ -600,7 +707,8 @@ Para começar, recomendo o nível 1 ou 2. Só aumente a autonomia depois de comp
 
 Não considere uma instrução no prompt suficiente para proteger credenciais, dados ou infraestrutura. Use também os controles técnicos de permissões e isolamento disponíveis.
 
-## 5. Integrar sistemas e agentes: MCP, APIs e plugins
+## 9. Integrar sistemas e agentes: MCP, APIs e plugins
+[Catalogo de Plugins - Hermes - Oficial](https://hermes-agent.nousresearch.com/docs/plugins)
 
 Essa etapa só é necessária quando o agente precisa acessar recursos além das ferramentas já disponíveis.
 
@@ -642,7 +750,7 @@ mcp_servers:
 
 Esse exemplo ilustra a estrutura e a seleção de ferramentas, não uma configuração pronta para copiar sem verificar a compatibilidade com a versão instalada e o mecanismo de gerenciamento de credenciais. Nunca coloque tokens reais em arquivos compartilhados ou no `SOUL.md`.
 
-## 6. Testar, avaliar e monitorar
+## 10. Testar, avaliar e monitorar
 
 Um profile configurado não é necessariamente um profile confiável. É preciso medir se ele realmente executa bem sua função.
 
@@ -665,7 +773,7 @@ Registre falhas e corrija primeiro a causa: instruções incompletas, Skill inad
 
 ---
 
-## Atingindo o nível máximo de performance
+## 11. Atingindo o nível máximo de performance
 
 ### A. Otimizar custo, contexto e desempenho
 
