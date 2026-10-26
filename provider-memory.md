@@ -1,4 +1,4 @@
-# Memória de IA aplicada ao Hermes Agent
+# Aprimorando a Memória do Agente com Provider Memory
 
 > Guia didático e prático baseado nos projetos [Mnemosyne](https://github.com/mnemosyne-oss/mnemosyne) e [Hindsight](https://github.com/vectorize-io/hindsight), e na documentação atual de integração com Hermes. Consultado em 25/10/2026.
 
@@ -8,7 +8,7 @@ Ao terminar, você deverá conseguir explicar o que é memória para um agente, 
 
 ## 1. A ideia básica
 
-Um modelo de linguagem não se lembra automaticamente de uma conversa encerrada. Em cada chamada, ele recebe uma janela de contexto: as instruções, mensagens e dados que o aplicativo escolhe enviar. A memória de agente é uma camada externa que seleciona e guarda informações úteis para chamadas futuras.
+Um modelo de linguagem não se lembra automaticamente de uma conversa encerrada. Em cada chamada, ele recebe uma janela de contexto: as instruções, mensagens e dados que o aplicativo escolhe enviar. O provedor de memória de um agente é uma camada externa que seleciona e guarda informações úteis para chamadas futuras.
 
 Uma analogia: contexto é a mesa de trabalho aberta agora; memória é o arquivo que pode ser consultado depois. Uma janela maior permite colocar mais coisas na mesa, mas não decide por si só o que merece ser guardado nem recupera automaticamente um fato de semanas atrás.
 
@@ -63,11 +63,22 @@ Uma boa memória é útil, correta, recuperável e editável. Guardar cada frase
 
 ### Mnemosyne
 
-Mnemosyne é apresentado pelo projeto como uma camada local-first, baseada em SQLite, com integração específica para Hermes e interfaces para outros agentes. A vantagem central é reduzir dependência de um serviço remoto e manter o armazenamento na máquina. A busca semântica pode exigir extras de embeddings; o perfil mínimo e o perfil com modelos locais têm requisitos de memória diferentes. Consulte o README e o guia de Hermes antes de instalar, pois pacotes e instruções evoluem.
+Mnemosyne é apresentado pelo projeto como uma camada local-first, não exige de um LLM para funcionar, baseada em SQLite e roda incrivelmente rápido, com integração específica para Hermes e interfaces para outros agentes. A vantagem central é reduzir dependência de um serviço remoto e manter o armazenamento na máquina. A busca semântica pode exigir embeddings extras; o perfil mínimo e o perfil com modelos locais têm requisitos de memória diferentes.
+
+<div align="left">
+  <img width="600" title="memory8" src="./img/memory8.png" style="margin-right: 50px;"/>
+  <img width="600" title="memory9" src="./img/memory9.png" style="vertical-align: top;"/>
+</div><br>
+
 
 ### Hindsight
 
-Hindsight usa as operações **retain**, **recall** e **reflect**: guardar informação, recuperar memórias relevantes e sintetizar uma resposta a partir delas. O projeto oferece execução Cloud, local incorporada ao Hermes e instância local/remota própria. A integração atual é um plugin do catálogo Hermes; a documentação alerta que o antigo pacote isolado `hindsight-hermes` está obsoleto. A execução local incorporada ainda pode depender de um provedor de LLM para extração/síntese; “local” não implica automaticamente ausência de chamadas externas em toda configuração.
+Hindsight está entre os melhores atualmente, por usar as operações **retain**, **recall** e **reflect**: guardar informação, recuperar memórias relevantes e sintetizar uma resposta a partir delas. O projeto oferece execução Cloud, local incorporada ao Hermes e instância local/remota própria. A integração atual é um plugin do catálogo Hermes; (nota: documentação alerta que o antigo pacote isolado `hindsight-hermes` está obsoleto). A execução local incorporada ainda pode depender de um provedor de LLM para extração/síntese; “local” não implica automaticamente ausência de chamadas externas em toda configuração.
+
+<div align="left">
+  <img width="650" title="memory10" src="./img/memory10.png" style="margin-right: 10px; vertical-align: top;"/>
+  <img width="550" title="memory11" src="./img/memory11.png"/>
+</div><br>
 
 | Critério | Mnemosyne | Hindsight |
 |---|---|---|
@@ -78,6 +89,12 @@ Hindsight usa as operações **retain**, **recall** e **reflect**: guardar infor
 | Privacidade | Boa opção quando o banco e modelos permanecem locais; verifique a configuração de embeddings | Depende do modo: Cloud envia dados ao serviço; local reduz essa dependência, mas confira o LLM configurado |
 | Melhor encaixe provável | Uso individual, simplicidade e prioridade em armazenamento local | Fluxos mais ricos, reflexão, múltiplos modos de implantação ou serviço compartilhado |
 | Ponto de atenção | A qualidade semântica e requisitos variam conforme extras/configuração | Mais componentes e decisões de implantação; plugin antigo não deve ser seguido |
+
+<div align="left">
+  <img width="600" title="memory12" src="./img/memory12.png" style="margin-right: 50px;"/>
+  <img width="600" title="memory13" src="./img/memory13.png"/>
+</div><br>
+
 
 ### Gráfico qualitativo para orientar a escolha
 
@@ -90,7 +107,7 @@ Escala didática de 1 a 5, não é benchmark nem avaliação independente. “Si
 | Riqueza explícita de operações | ███ 3 | █████ 5 |
 | Baixa dependência de infraestrutura | █████ 5 | ██ 2 |
 
-Escolha **Mnemosyne** se sua prioridade inicial for começar localmente com uma base SQLite e integração voltada ao Hermes. Avalie **Hindsight** se precisar de `reflect`, múltiplos bancos, Cloud/servidor ou da experiência de memória integrada ao plugin Hermes. Nenhuma opção é universalmente superior; teste as perguntas e os dados reais do seu uso.
+Escolha **Mnemosyne** se sua prioridade inicial for começar localmente com uma base SQLite e integração voltada ao Hermes. Avalie **Hindsight** se precisar de `reflect`, múltiplos bancos, Cloud/servidor ou da experiência de memória integrada ao plugin Hermes. Nenhuma opção é universalmente superior.
 
 ## 4. Uma conversa do Hermes com memória
 
@@ -112,9 +129,13 @@ sequenceDiagram
 
 Há duas formas de o provider ajudar: **injeção automática de contexto** (o provider busca antes da resposta) e **ferramentas disponíveis ao modelo** (o Hermes decide chamar recall/retain). Uma integração pode combinar as duas. Se a memória não aparece, verifique provider ativo, disponibilidade e modo configurado.
 
-## 5. Aplicação prática: começar com Mnemosyne
+---
 
-> Os comandos abaixo refletem a documentação consultada. Confira o README e o guia de Hermes antes de executá-los, pois instalação e nomes de configuração podem mudar. Este roteiro não executa mudanças no seu Hermes.
+## 5. Aplicação prática: Mnemosyne
+
+### Documentação de consulta
+
+[Mnemosyne - Site](https://mnemosyne.site/pt/); [Mnemosyne - GitHub](https://github.com/mnemosyne-oss/mnemosyne?tab=readme-ov-file); [Mnemosyne - blog](https://www.glukhov.org/ai-systems/hermes/mnemosyne-memory/#installing-mnemosyne-into-hermes)
 
 ### Passo 1 — confirmar o ambiente
 
@@ -176,7 +197,7 @@ Não considere o primeiro teste como prova suficiente. Faça perguntas diretas e
 - Defina uma forma de corrigir e apagar informações; teste-a.
 - Após atualizar Hermes ou o provider, rode `hermes memory status` e repita os testes básicos.
 
-## 6. Aplicação prática: começar com Hindsight
+## 6. Aplicação prática: Hindsight
 
 O caminho documentado atual é usar o plugin do catálogo Hermes. Há três modos; escolha um antes de configurar:
 

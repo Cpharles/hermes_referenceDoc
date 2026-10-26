@@ -612,7 +612,7 @@ Teste prático: informe uma preferência não sensível ao agente, encerre a ses
 ### 6.5 Aprimorando a Memória
 Se houver necessidade real de busca semântica entre muitas sessões, avalie um **Provedor de Memória Externo** após definir governança e localização dos dados, partrido para a execução do `hermes memory setup`.
 Os provedores de memória externos são aditivos à memória embutida/nativa (built-in interno) e somente um provedor de memória externo fica ativo por vez. Considere para um agente individual de produção documental, comece pela memória embutida (built-in) e só acrescente provedor quando houver caso de uso demonstrado.
-Ver documentação sobre ["Aprimorando a Memória em IA"](memoria-ia-hermes.md)
+Ver documentação sobre ["Aprimorando a Memória do Agente com Provider Memory"](provider-memory.md)
 
 ---
 

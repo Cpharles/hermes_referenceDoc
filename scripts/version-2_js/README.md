@@ -1,11 +1,29 @@
 # EXECUTANDO O SCRIPT
 
 ## Conteúdo
+
 <!-- toc -->
 
-## 1. Executando dentro de um Conteiner - Docker
+- [1. Criando e Configurando o Profile](#1-criando-e-configurando-o-profile)
+  * [1. Acessando o Terminal SSH](#1-acessando-o-terminal-ssh)
+  * [2. Ativando o Ambiente Virtual](#2-ativando-o-ambiente-virtual)
+  * [3. Preparando a pasta para rodar o scrit](#3-preparando-a-pasta-para-rodar-o-scrit)
+  * [4. Instalando as dependências:](#4-instalando-as-dependencias)
+  * [5. Registrando o script para o exececutável](#3-registrando-o-script-para-o-exececutável)
+  * [5. Executando o Script](#5-executando-o-script)
+- [2. Configurando skills para um profile](#2-configurando-skills-para-um-profile)
+  * [1. Preparando a pasta para rodar o scrit](#1-preparando-a-pasta-para-rodar-o-scrit)
+  * [2. Registrando o script para o exececutável](#3-registrando-o-script-para-o-exececutável)
+  * [3. Executando o Script](#3-executando-o-script)
 
-### 1. Via Terminal SSH
+<!-- tocstop -->
+
+> [!NOTE]
+> Estas esplicação é baseado na execução dentro de um Conteiner - Docker
+
+## 1. Criando e Configurando o Profile 
+
+### 1. Acessando o Terminal SSH
 Abra o terminal e execute:
 ```bash
 # Acessando o servidor
@@ -41,27 +59,58 @@ ENV PATH="/opt/hermes/.venv/bin:$PATH"
 ```
 Isso garante que o binário esteja no PATH para qualquer shell, incluindo os criados por docker exec . Em versões mais recentes da imagem oficial, esse ajuste já foi incorporado , então atualizar a imagem também pode resolver.
 
-### 3. Crie uma pasta com os arquivos
-```text
-create-profile.mjs
-package-lock.json
-package.json
-```
+### 3. Preparando a pasta para rodar o scrit
+**Step 1**
+Criar uma pasta para rodarmos o script 
+
 >[!NOTE]
 > Pode ser em qualquer diretório, mas dê preferência para criar dentro da pasta onde esta o profile standard do Hermes.
 > `./opt/data` pasta home (Linux)
 > `%LOCALAPPDATA%\hermes` pasta home (Windows)
 
+**Step 2**
+Copie o script para esta pasta e execute:
+```bash
+npm init -y
+```
+Este comando garante que teremos o minimo necessário para rodarmos qualquer pacote dentro do projeto. Cria um arquivo package.json mínimo na pasta atual. Esse arquivo é a âncora do projeto — é ele que diz ao npm "instale tudo aqui dentro, nesta pasta". Sem ele, o npm não sabe qual é a raiz do projeto.
+
+**Step 3**
+Depois confira a pasta e note que teremos os seguintes arquivos
+```bash
+ls -a1
+
+# saída esperada
+create-profile.mjs
+package.json
+```
+
 ### 4. Instalando as dependências:
-Após a instalação das dependências, podemos ver a criação de uma pasta com o nome `node_modules`
+Vamos executar este comando para instalar as dependências que precisamos para rodar o script
+
 ```bash
 npm install @clack/prompts js-yaml chalk dotenv
 ```
+O que isso faz:
+- Baixa os pacotes `@clack/prompts` `js-yaml` `chalk` `dotenv`;
+- Cria a pasta node_modules/ nessa pasta;
+- Coloca os executáveis em node_modules\.bin\;
+Após a instalação das dependências, podemos ver a criação de uma pasta com o nome `node_modules`
+
 > [!NOTE]
 > A instalação das dependência é feito somente uma vez
 
-### 5. Executando o Script
+### 5. Registrando o script para o exececutável
+Vamos editar o arquivo `package.json` e adcione a linha
+```json
+ "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create-profile": "node skill-config.mjs"
+  },
+```
+O que isso faz: diz ao node como vamos executar este escript
 
+### 6. Executando o Script
 Para facilitar o preenchimento das variáveis do script, crie uma arquivo ou planilha já com os seguintes informações.
 
 | Variável | Descrição |
@@ -103,36 +152,27 @@ Aguarde o processo finalizar, ao termino teremos uma tela:
 
 ## 2. Configurando skills para um profile
 
-Verifique se já foi instalado as dependências, caso contrário, faça primeiro
+### 1. Preparando a pasta para rodar o scrit
+Verifique se já temos a pasta `node_module` e se foi instalado as dependências, caso contrário, faça primeiro o **Item 3 do Step1 até Step 4** [Preparando a pasta para rodar o scrit](#3-preparando-a-pasta-para-rodar-o-scrit)
 
-### 1. Crie uma pasta com os arquivos
-
-```text
-skill-config.mjs
-package-lock.json
-package.json
+### 2. Registrando o script para o exececutável
+Vamos editar o arquivo `package.json` e adcione a linha
+```json
+ "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create-profile": "node skill-config.mjs"
+  },
 ```
+O que isso faz: diz ao node como vamos executar este escript
 
->[!NOTE]
-> Pode ser em qualquer diretório, mas dê preferência para criar dentro da pasta onde esta o profile standard do Hermes.
-> `./opt/data` pasta home (Linux)
-> `%LOCALAPPDATA%\hermes` pasta home (Windows)
-
-### 2. Instalando as dependências:
-
-Após a instalação das dependências, podemos ver a criação de uma pasta com o nome `node_modules`
-
-```bash
-npm install @clack/prompts js-yaml chalk dotenv
-```
-
-> [!NOTE]
-> A instalação das dependência é feito somente uma vez
-
+### 3. Executando o Script
 Depois é só execute o comando e seguir as instruções
 
 ```bash
 npm run skill-config
 ```
-
 O script permite escolher um profile, marcar as skills que devem permanecer habilitadas e confirmar a alteração. As skills desmarcadas são gravadas em `skills.disabled` no `config.yaml` desse profile. Ao final, a lista atualizada de skills é exibida pelo Hermes.
+
+<div align="left">
+  <img width="600" title="skill-config" src="./skill-config.png"/>
+</div><br>
