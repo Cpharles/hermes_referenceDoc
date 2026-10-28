@@ -1,6 +1,11 @@
-# Aprimorando a Memória do Agente com Provider Memory
+# Aprimorando a Memória do Agente com Memory Provider
 
 > Guia didático e prático baseado nos projetos [Mnemosyne](https://github.com/mnemosyne-oss/mnemosyne) e [Hindsight](https://github.com/vectorize-io/hindsight), e na documentação atual de integração com Hermes. Consultado em 25/10/2026.
+
+## Conteúdo
+<!-- toc -->
+
+<!-- tocstop -->
 
 ## Para quem é este guia
 
@@ -133,15 +138,76 @@ Há duas formas de o provider ajudar: **injeção automática de contexto** (o p
 
 ## 5. Aplicação prática: Mnemosyne
 
-### Documentação de consulta
+### - Documentação de consulta
 
-[Mnemosyne - Site](https://mnemosyne.site/pt/); [Mnemosyne - GitHub](https://github.com/mnemosyne-oss/mnemosyne?tab=readme-ov-file); [Mnemosyne - blog](https://www.glukhov.org/ai-systems/hermes/mnemosyne-memory/#installing-mnemosyne-into-hermes)
+Sites oficiais do projeto -> [Mnemosyne - Site](https://mnemosyne.site/pt/); [Mnemosyne - GitHub](https://github.com/mnemosyne-oss/mnemosyne?tab=readme-ov-file)
+[Documentação](https://docs.mnemosyne.site/getting-started/quick-start)
+[Mnemosyne - blog](https://www.glukhov.org/ai-systems/hermes/mnemosyne-memory/#installing-mnemosyne-into-hermes)
 
-### Passo 1 — confirmar o ambiente
+**PORQUE UTILIZAR MNEMOZYNE**
+<div align="left">
+  <img width="600" title="memory14" src="./img/memory14.png"/>
+</div><br>
 
-Abra um terminal onde `hermes` esteja disponível e confira a versão e o perfil ativo. Anote o diretório `HERMES_HOME` se você usa um perfil não padrão; isso define onde o provider, a configuração e os dados podem ser instalados.
+### - Introdução
+A ídeia principal aqui é montarmos o Mnemosyne fora do ambiente principal do Hermes caso contrario nosso Mnemozyne vai morrer quando efetuarmos a atualização do Hermes, pois quando atualizamos o ambiente de gerenciamento virtual do Hermes no container é recriado e tudo dentro dele é perdido. É o mesmo principio que utilizamos para o volume de dados persistente para o Hermes, criado fora do container, normalmente em uma pasta `./opt/data`
 
-### Passo 2 — escolher o perfil de recursos
+<div align="left">
+  <img width="600" title="memory15" src="./img/memory15.png"/>
+</div><br>
+
+### Passo 1 — Confirmar o ambiente
+Assim como a maioria dos memorys provider o Mnemozyne também não é um provedor integrado no Hermes e sim um plugin, portanto temos que instalar de uma forma um pouco mais manual. Vamos optar pela instalação usando o Mnemozyne como um pluging do Hermes, mas ele também será reconhecido como um provedor de memória, ([documentação de ref](https://docs.mnemosyne.site/api/hermes-plugin#hermes-plugin))
+Abra um terminal onde `hermes` esteja disponível e confira a versão e o perfil ativo.
+
+> [!WARNING]
+> Como estamos trabalhando com Docker e o Hermes esta rodando dentro de um container, a instalação precisa ser feita no mesmo ambiente Python que o Hermes utiliza internamente.
+
+```bash
+#entra no container do Hermes
+docker ps
+docker exec -it <id_container> /bin/bash
+
+# executamos o comando para ver o status atual das configurações da memória
+hermes memory status
+
+# saída esperada
+Memory status
+────────────────────────────────────────
+  Built-in (MEMORY.md / USER.md):
+    Memory injection:   enabled ✓
+    User profile:       enabled ✓
+    Memory tool:        enabled ✓
+  Provider:  (none — built-in only)
+
+  Installed plugins:
+    • byterover  (API key / local)
+    • retaindb  (API key / local)
+```
+
+Podemos notar que não temos um provider memory, estamos somente como memória interna (built-in)  
+Agora todas as execuções de comando será dentro do container do Hemres, então anote o diretório `HERMES_HOME` principalmente se você usa um perfil não padrão; isso será importante para definirmos onde o provider, a configuração e os dados podem ser instalados.
+
+```bash
+pwd   # verifica a localização atual
+
+# temos que estar no diretório raiz root e depois entra no diretório /opt
+# listamos o conteúdo da pasta ./opt
+ls -a1
+
+# saída
+.
+..
+data
+hermes
+```
+Podemos verificar que temos nesta pasta `./opt/` duas outras pastas `data` e `hermes`
+`./opt/data/` -> é onde temos o volume dos dados percistentes, onde esta as informações e configurações dos agentes e tudo mais que configuramos no hermes
+`./opt/hermes/` -> é justamente o sistema volátil, este se perde quando executamos a atualização do hermes, pois o container vai montar toda esta pasta novamente.
+
+<br>
+
+### Passo 2 — Escolher o perfil de recursos para o Mnemosyne
 
 | Perfil documentado | Quando considerar | Impacto aproximado publicado pelo projeto |
 |---|---|---:|
@@ -149,36 +215,284 @@ Abra um terminal onde `hermes` esteja disponível e confira a versão e o perfil
 | `mnemosyne-memory[embeddings]` | Embeddings locais em desktop com recursos moderados | ~800 MB |
 | `mnemosyne-memory[all]` | Recursos locais completos, inclusive componentes de consolidação | ~1,5 GB |
 
-Esses valores são estimativas do projeto, não garantias para toda máquina. Confirme também o requisito de RAM livre e se o modelo de embeddings usado exige uma API externa ou pacote local.
+<br>
 
-### Passo 3 — instalar o provider Hermes
+### Passo 3 - Criar o ambiente venv independente
 
-A documentação lista `mnemosyne-hermes` para a integração Hermes. Para o fluxo direto, a orientação é instalar o pacote do provider junto com o perfil base escolhido e então configurar o provider. Em ambientes gerenciados ou com instalação persistente via wrapper, siga a seção correspondente no [guia oficial Hermes](https://github.com/mnemosyne-oss/mnemosyne/blob/main/docs/hermes-integration.md); não misture ambientes Python sem conferir qual deles o Hermes usa.
+O interpretador do Python é um link simbólico que aponta para o Python do sistema /usr/local/bin/python3, e não um interpretador independente da venv do Hermes em `/opt/hermes/.venv/bin`. Neste caso não é possível usar diretamente esse python que aponta para o sistema para criar a venv, porque pode causar incompatibilidade na versão do interpretador Python, resultando em falha silenciosa no carregamento de dependências compiladas (como numpy, onnxruntime), e a recuperação vetorial sempre retornará pontuação zero.
+ Execute os seguintes comandos (dentro do container):
 
 ```bash
-pip install --upgrade mnemosyne-hermes
+# 1-Definem variáveis de ambiente no shell atual, não executam nenhuma instalação ou alteração de arquivo
+export HERMES_HOME=/opt/data   # ajuste conforme sua configuração real
+VENV="$HERMES_HOME/.mnemosyne/venv"
+
+
+# 2-Criar venv independente (usando o python do sistema, mas o caminho da venv está fora do Hermes)
+python3 -m venv "$VENV"
+"$VENV/bin/python" -m pip install --upgrade pip
+"$VENV/bin/python" -m pip install 'mnemosyne-memory[embeddings]' mnemosyne-hermes
 ```
 
-Se você escolheu embeddings locais, instale também o extra compatível indicado no README, por exemplo `mnemosyne-memory[embeddings]`. O provider `mnemosyne-hermes` é a integração Hermes; ele não substitui a seleção do perfil de recursos desejado.
+**- Onde a venv realmente é criada**
+Com as variáveis que definimos no item 1 do bloco de comandos:
 
-### Passo 4 — selecionar no Hermes
+`HERMES_HOME=/opt/data`
+`VENV="$HERMES_HOME/.mnemosyne/venv"` → ou seja, VENV aponta para `**/opt/data/.mnemosyne/venv**`
 
+Portanto, o comando `python3 -m venv "$VENV"` cria toda a estrutura da venv (pastas bin, lib, pyvenv.cfg, etc.) em `/opt/data/.mnemosyne/venv`.
+
+**- Como verificar se a venv foi criada corretamente**
+Execute um destes comandos:
 ```bash
+ls -la /opt/data/.mnemosyne/venv
+
+# saida esperada
+.
+..
+.gitignore
+bin
+include
+lib
+lib64
+pyvenv.cfg
+
+# podemos ainda confirmar  que o interpretador da venv existe
+/opt/data/.mnemosyne/venv/bin/python --version
+
+# saida esperada
+Python 3.14.9
+```
+</br>
+
+### Passo 4 — Instalar e registrar o Mnemosyne como provider 
+
+Para o fluxo direto, a orientação é instalar o pacote do provider junto com o perfil base escolhido (passo 2) e então configurar o provider.
+
+<div align="left">
+  <img width="600" title="memory16" src="./img/memory16.png"/>
+</div><br>
+
+Podemos verificar no dashboard do Hermes que antes da instalação do Mnemosyne, só temos disponível o "built-in | default"
+
+<div align="left">
+  <img width="600" title="memory17" src="./img/memory17.png" style="margin-right: 50px;"/>
+  <img width="500" title="memory18" src="./img/memory18.png"/>
+</div><br>
+
+Para garantir que estamos atribuindo todas as configurações para o profile correto, ative-o ante de iniciar
+```bash
+hermes profile use <profile_name>
+```
+
+**Instalando Mnemosyne no seu próprio ambiente**
+```bash
+# 3-Registrar o plugin com o instalador oficial do wrapper (não é necessário criar link manualmente)
+"$VENV/bin/mnemosyne-hermes" install --mode wrapper --python "$VENV/bin/python"
+
+# saída esperada
+  Profile docvet_revisor: linked /opt/data/profiles/docvet_revisor/plugins/mnemosyne
+Installed. Wrapper directory at /opt/data/plugins/mnemosyne
+  Python: /opt/data/.mnemosyne/venv/bin/python
+  Site-packages: /opt/data/.mnemosyne/venv/lib/python3.14/site-packages
+  Skill: Installed bundled skill at /opt/data/skills/memory/mnemosyne-memory-override/SKILL.md.
+Done. Next steps:
+  hermes config set memory.provider mnemosyne
+  hermes memory status
+
+
+# 4-Configurar o provider memory como Mnemosyne
 hermes config set memory.provider mnemosyne
+
+#saída esperada:
+✓ Set memory.provider = mnemosyne in /opt/data/config.yaml
+
+
+# 5-Reiniciar o dateway
+hermes gateway restart
+
+# 6-Habilitando o Plugin hermes-mnemosyne
+hermes plugins enable hermes-mnemosyne
 ```
 
-Reinicie o gateway ou inicie uma nova sessão, conforme seu modo de execução. A documentação atual separa provider externo e memória interna do Hermes. **Não use `hermes tools disable memory` para trocar de provider**: isso desativa o conjunto de ferramentas de memória. Mantenha a memória interna como referência/rollback enquanto valida a migração.
+**Por que esta é a abordagem correta**
+* O instalador `--mode wrapper` irá automaticamente em `$HERMES_HOME/plugins` registrar o plugin, você não precisa mais criar o link simbólico manualmente.
+* A venv independente está fora da venv gerenciada do Hermes, então a atualização do Hermes não a apagará.
+* `mnemosyne-memory[embeddings]` fornece a biblioteca principal e funcionalidade de vetor, enquanto `mnemosyne-hermes` é apenas uma camada de wrapper e deve ser instalado junto.
 
-### Passo 5 — confirmar provider e ferramentas
+<br>
 
+### Passo 5 — Verificação e validação
+
+Podemos verificar o status do nosso provider memory "Mnemosyne". E aqui podemos notar que temos a confirmação da criação do nosso bando de dados e que esta como "default", ou seja, qualquer agente que for apontado para esta memória vai ter acesso ao banco de dados.
+**Obs.:** DB só será criado após a primeira utilização, antes disso, se entrarmos no endereço `/opt/data/mnemosyne/`, vamos notar que ainda não temos `/data/mnemosyne.db`
+```bash
+hermes tools list | grep mnemosyne
+"$VENV/bin/mnemosyne" stats
+
+# saída esperada
+Mnemosyne Stats
+
+  Total memories: 0
+  Working memory: 0
+  Episodic memory: 0
+  Knowledge triples: 0
+
+  Banks: default
+  DB path: /opt/data/mnemosyne/data/mnemosyne.db
+```
+
+Se executarmos novamente o comando de status da memória disponível no Hermes, agora podemos observar que além da memória interna (built-in) temos também o provider memory com o Mnemosyne:
 ```bash
 hermes memory status
-hermes tools list
+# ou executar para um profile especifico
+hermes --profile <profile_name> memory status
+
+emory status
+────────────────────────────────────────
+  Built-in (MEMORY.md / USER.md):
+    Memory injection:   enabled ✓
+    User profile:       enabled ✓
+    Memory tool:        enabled ✓
+  Provider:  mnemosyne
+
+  mnemosyne config:
+    auto_sleep: True
+    profile_isolation: False
+    shared_surface_read: False
+    sleep_threshold: 50
+    vector_type: int8
+    default_scope: global
+    ignore_patterns: 1 configured
+    skip_contexts: cron,flush,subagent,background,skill_loop
+    sync_roles: []
+    shared_surface_path: data/shared/mnemosyne.db
+
+  Plugin:    installed ✓
+  Status:    available ✓
+
+  Installed plugins:
+    • byterover  (API key / local)
+    • retaindb  (API key / local)
+    • mnemosyne  (local) ← active
 ```
 
-Confirme no status que Mnemosyne é o provider ativo e está disponível. Na lista de ferramentas, procure os nomes `mnemosyne_...`; o inventário do runtime é a fonte confiável para a versão instalada. Se o provider não estiver disponível, revise o perfil/Hermes home, a instalação no ambiente Python correto e reinicie.
+### Passo 6 — Adicionando outros profiles para usar o Mnemosyne
 
-### Passo 6 — testar com dados não sensíveis
+Não é necessário executar novamente o comando completo de instalação para cada profile. Para outros profiles, a abordagem mais segura e recomendada pela documentação oficial é criar manualmente um **link simbólico (symlink)** apontando para o diretório wrapper já instalado.
+Antes de criar o link simbólico, vá até o dashboard do Hermes, *selecione o profile* desejado e depois no painel **PLUGIN** selecione o **Mnemosyne** em **MEMORY PROVIDER**, em seguida role a tela para baixo até encontrar o botão **SAVE MEMORY PROVIDER** e confirme a auteração.
+
+<div align="left">
+  <img width="900" title="memory19" src="./img/memory19.png"/>
+</div><br>
+
+Para garantir que estamos atribuindo todas as configurações para o profile correto, ative-o ante de iniciar
+```bash
+hermes profile use <profile_name>
+```
+
+Eexecute os seguintes comandos dentro do container:
+```bash
+# 1. Defina o caminho do profile que deseja adicionar
+PROFILE=/opt/data/profiles/<profile_name>
+TARGET="$PROFILE/plugins/mnemosyne"
+
+# 2. Verifica e garanta que o diretório plugins do profile exista
+mkdir -p "$PROFILE/plugins"
+
+# 3. Crie o link simbólico apontando para o wrapper base já instalado
+ln -s /opt/data/plugins/mnemosyne "$TARGET"
+
+# 4-Habilitando o Plugin hermes-mnemosyne
+hermes plugins enable hermes-mnemosyne
+
+# 5. Verificação o status do memory provider para o profile
+ls -la /opt/data/profiles/<profile_name>/plugins/mnemosyne
+
+hermes --profile <profile_name> memory status
+```
+
+**Por que não executar install novamente**
+A documentação oficial indica explicitamente que, para múltiplos profiles que compartilham a mesma side venv, cada profile pode criar um symlink apontando para o wrapper base já verificado, sem necessidade de executar novamente o instalador. Executar novamente install não só é redundante, como pode, em caso de descuido, sobrescrever acidentalmente um destino de plugin já existente (embora o instalador tenha proteção contra isso, criar o link manualmente é mais controlável).
+
+> [!WARNING]
+> O link simbólico (symlink) para múltiplos profiles, na versão atual no dashboard web do Hermes, não pode ser configurado de forma confiável; recomenda-se fortemente que você ainda o faça através da linha de comando (terminal).
+
+<br>
+
+### Passo 7 — Configuração das variáveis do Memory Provider
+
+Temos dois lugares que podemos fazer as configurações corretas de uso do memory provider:
+1. Pelo arquivo `config.yaml` no bloco `memory:` em CONFIG -> (botão) <>YAML (todos os parametros)
+2. Pelo Dashboard do Hermes em PLUGIN -> MEMORY PROVIDER (para alguns parametros)
+3. Pelo comando via terminal `hermes memory setup` (para alguns parametros)
+
+Vamos optar por configurar pelo arquivo `config.yaml`
+
+#### 🔴 Deve ser alterado (afeta diretamente a correção funcional)
+
+`memory.memory_enabled: true` → Recomenda-se alterar para `false`
+`user_profile_enabled: false` → Recomenda-se alterar para `false`
+Esta é a questão mais crítica na sua configuração atual. A documentação oficial do Mnemosyne afirma claramente: quando o Mnemosyne está ativo, o armazenamento de memória embutido do Hermes (MEMORY.md/USER.md) deve ser desativado para evitar duplicação de armazenamento e desperdício de tokens. Após a alteração, a ferramenta de memória embutida (built-in) do Hermes são destivadas, mas todas as ferramentas do Mnemosyne (como mnemosyne_remember, mnemosyne_recall) continuam funcionando normalmente.
+
+> [!WARNING]
+> Não execute `hermes tools disable memory`, isso desativará tanto a ferramenta de memória embutida quanto todas as ferramentas do Mnemosyne (ambas compartilham o mesmo toolset). A abordagem correta é modificar o config.yaml:
+
+`memory.mnemosyne.profile_isolation: false` → Escolha conforme a necessidade, não é obrigatório alterar
+* **false** (default): todos os profiles compartilham um único banco de dados SQLite, com memórias interoperáveis entre si.
+* **true**: cada profile usa um arquivo SQLite independente, com isolamento de memória.
+
+
+#### 🟢 Manter (os valores padrão já são razoáveis)
+
+`auto_sleep: true` — Manter ativado. A consolidação automática de memória (sleep) é a chave para o Mnemosyne transferir memórias de trabalho para memórias episódicas, mantendo assim a recuperação eficiente. Desativar fará com que as memórias de trabalho se acumulem, afetando o desempenho a longo prazo.
+
+`sleep_threshold: 50` — Manter. Este é o valor padrão, indicando que o sleep é acionado automaticamente após 50 entradas na memória de trabalho. A menos que você gere um volume extremamente alto de memórias diariamente (nesse caso pode reduzir para 30 para consolidar mais cedo), manter o padrão é suficiente.
+
+`vector_type: int8` — Manter. Este é o tipo de vetor padrão do Mnemosyne, com menor uso de armazenamento e velocidade de recuperação suficiente. Trocar para float32 aumentará precisão marginalmente, mas consumirá muito mais memória e espaço em disco, com baixo custo-benefício.
+
+`reflect: {disabled_for_cron: True, max_calls_per_session: 3}` — Manter. Limitar a reflexão a 3 vezes por sessão e desativá-la em tarefas agendadas (cron) evita ciclos infinitos de auto-reflexão consumindo tokens, uma proteção razoável.
+
+`skip_contexts: cron,flush,subagent,background,skill_loop` — Manter. Não injetar memória nesses contextos evita interferência desnecessária e desperdício de tokens, especialmente em fluxos de trabalho em background ou subagentes.
+
+`sync_roles: [''user'']` — Manter. Sincronizar apenas mensagens do usuário para o Mnemosyne, não do assistente, reduz ruído e chamadas de ferramentas desnecessárias.
+
+
+#### 🟡 Ajustável conforme preferência (não afeta correção, apenas experiência)
+
+`default_scope: session` → Considere alterar para global
+* **session** (atual): memórias visíveis apenas na sessão atual, expiram após a sessão terminar.
+* **global**: memórias visíveis em todas as sessões, duradouras.
+Se você espera que o agente se lembre de fatos de longo prazo (como "o usuário prefere respostas em português"), session fará com que essas informações desapareçam após reiniciar a sessão. Nesse caso, altere para global. Se você usa o Mnemosyne apenas como scratchpad temporário dentro de uma sessão, mantenha session.
+
+`write_classifier: 'off'` — Manter off. O classificador de escrita adiciona uma chamada extra de LLM antes de cada escrita de memória para determinar se deve armazenar, aumentando latência e consumo de tokens. Desativá-lo permite que o agente armazene diretamente; a menos que você tenha exigências extremas de precisão de memória, não é necessário ativar.
+
+`shared_surface_read: false e shared_surface_path` — Manter o padrão. A superfície compartilhada é usada para cenários de compartilhamento de memória entre múltiplos agentes; se você usa apenas um agente, não precisa ativar.
+
+
+#### ⚪ Não recomendado alterar (a menos que tenha necessidades específicas)
+
+`memory_char_limit: 2200` / `user_char_limit: 1375`: estes são os limites de caracteres para injeção da memória embutida do Hermes no prompt do sistema. Como você alterará memory_enabled para false, estes dois valores não terão mais efeito. Se no futuro você reativar a memória embutida, precisará reavaliar.
+
+`nudge_interval: 10`: frequência com que o Hermes lembra o agente de usar a memória. O valor padrão de 10 é razoável; diminuir aumenta a sobrecarga de lembretes, aumentar pode fazer o agente esquecer de usar a memória.
+
+`prefetch_spill_enabled: false`: funcionalidade experimental; manter desativado.
+
+#### Resumo dos pontos de atenção:
+
+| Ação | Item | Valor recomendado |
+|------|------|----------|
+| **Alteração obrigatória** | `memory_enabled` | `false` |
+| **Alteração obrigatória** | `user_profile_enabled` | `false` |
+| **Ajustável conforme necessidade** | `profile_isolation` | `true` (se isolamento necessário) |
+| **Ajustável conforme necessidade** | `default_scope` | `global` (se memória de longo prazo necessária) |
+| Manter | todos os outros itens | valores atuais |
+
+Após a alteração, reinicie o gateway com `hermes gateway restart` e use `hermes tools list | grep mnemosyne` para confirmar que as ferramentas estão carregadas normalmente.
+
+<br>
+
+### Passo 8 — Testar com dados não sensíveis
 
 1. Em uma sessão, informe uma preferência explícita e persistente, por exemplo: “Para este projeto, prefiro exemplos em Python”.
 2. Comece outra sessão e pergunte: “Qual linguagem prefiro para exemplos neste projeto?”
@@ -189,13 +503,21 @@ Confirme no status que Mnemosyne é o provider ativo e está disponível. Na lis
 
 Não considere o primeiro teste como prova suficiente. Faça perguntas diretas e indiretas, teste fatos conflitantes e observe se contexto de um projeto vaza para outro.
 
-### Passo 7 — operar com segurança
+### Passo 9 — Operar com segurança
 
 - Faça backup do banco SQLite antes de atualizações importantes; identifique o caminho real da base na configuração do seu perfil, sem presumir um diretório padrão.
 - Não memorize senhas, tokens, chaves privadas ou dados pessoais sensíveis sem uma necessidade clara.
 - Use escopo por usuário/projeto quando o provider oferecer essa capacidade.
 - Defina uma forma de corrigir e apagar informações; teste-a.
 - Após atualizar Hermes ou o provider, rode `hermes memory status` e repita os testes básicos.
+
+<br>
+
+---
+---
+
+
+
 
 ## 6. Aplicação prática: Hindsight
 
