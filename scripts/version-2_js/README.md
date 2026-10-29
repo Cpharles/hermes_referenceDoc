@@ -145,7 +145,7 @@ node create-profile.mjs
 
 Aguarde o processo finalizar, ao termino teremos uma tela:
 
-![script](script.png)
+![script](/img/script-profile.png)
 <br>
 
 ---
@@ -174,5 +174,5 @@ npm run skill-config
 O script permite escolher um profile, marcar as skills que devem permanecer habilitadas e confirmar a alteração. As skills desmarcadas são gravadas em `skills.disabled` no `config.yaml` desse profile. Ao final, a lista atualizada de skills é exibida pelo Hermes.
 
 <div align="left">
-  <img width="600" title="skill-config" src="./skill-config.png"/>
+  <img width="600" title="skill-config" src="/img/script-skill.png"/>
 </div><br>

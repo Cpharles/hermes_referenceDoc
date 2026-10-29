@@ -113,19 +113,42 @@ const hermesDir = await text({
 });
 if (isCancel(hermesDir)) { cancel('Operação cancelada.'); process.exit(0); }
 
+const HERMES_HOME = path.resolve(hermesDir);
+let profileListOutput;
+const stopProfileListSpinner = startTerminalSpinner('Buscando nomes dos profiles instalados...');
+try {
+  ({ stdout: profileListOutput } = await runCommand(
+    'hermes',
+    ['profile', 'list'],
+    { cwd: HERMES_HOME, shell: process.platform === 'win32', windowsHide: true },
+  ));
+} catch (error) {
+  stopProfileListSpinner(chalk.red('✗ Falha ao buscar os profiles.'));
+  console.error(chalk.red('Não foi possível listar os profiles do Hermes.'));
+  console.error(error.stderr?.toString() || error.message);
+  process.exit(1);
+}
+
+const installedProfiles = parseProfileList(profileListOutput);
+if (installedProfiles.length === 0) {
+  stopProfileListSpinner(chalk.yellow('⚠ Nenhum profile encontrado.'));
+  console.error(chalk.red('Nenhum profile foi encontrado pelo comando "hermes profile list".'));
+  process.exit(1);
+}
+stopProfileListSpinner(chalk.green(`✓ ${installedProfiles.length} profile(s) encontrado(s).`));
+
 const cloneFrom = await select({
   message: 'Profile base para clonar:',
-  options: [
-    { value: 'default', label: 'default (Recomendado)' },
-    { value: 'minimal', label: 'minimal' },
-  ],
-  initialValue: 'default',
+  options: installedProfiles.map(name => ({
+    value: name,
+    label: name === 'default' ? `${name} (Recomendado)` : name,
+  })),
+  initialValue: installedProfiles.includes('default') ? 'default' : installedProfiles[0],
 });
 if (isCancel(cloneFrom)) { cancel('Operação cancelada.'); process.exit(0); }
 
 // Normalização e paths
 const PROFILE_NAME = profileNameRaw.toLowerCase();
-const HERMES_HOME = path.resolve(hermesDir);
 const PROFILE_DIR = path.join(HERMES_HOME, 'profiles', PROFILE_NAME);
 const ENV_FILE = path.join(PROFILE_DIR, '.env');
 const CONFIG_FILE = path.join(PROFILE_DIR, 'config.yaml');
@@ -161,6 +184,27 @@ function runCommand(command, args, options = {}) {
       }
     });
   });
+}
+
+function parseProfileList(output) {
+  const ansiEscapeCodes = /\u001b\[[0-?]*[ -/]*[@-~]/g;
+  const names = [];
+
+  for (const rawLine of output.replace(ansiEscapeCodes, '').split(/\r?\n/)) {
+    let line = rawLine.trim().replace(/^[│|]+\s*/u, '');
+    if (!line || /^no profiles?\b/i.test(line)) continue;
+
+    // Remove markers such as ◆, *, ✓ and ▶, whether attached to the name or
+    // printed as a separate prefix column.
+    line = line.replace(/^[◆◇●○•*✓✔▶>]+\s*/u, '');
+    const name = line.split(/\s+/u)[0]?.replace(/^[◆◇●○•*✓✔▶>]+/u, '');
+
+    if (!name || /^(profile|profiles|name)$/i.test(name)) continue;
+    if (/^[─━—-]+$/u.test(name)) continue;
+    if (!names.includes(name)) names.push(name);
+  }
+
+  return names;
 }
 
 function startTerminalSpinner(message) {

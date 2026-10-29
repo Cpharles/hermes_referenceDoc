@@ -81,7 +81,7 @@ Agora podemos ver que o bot retornou o nosso nome de usuário **@username** e lo
 
 * Antes de proceguir vamos preencher uma tabela com os dados gerados, vamos precisar deles mais a frente para rodar o script de cadastro dos profiles dentro do Hermes.
 
-* Abra a planilha [referencias_profiles.xlsx](./referencias_profiles.xlsx):
+* Abra a planilha [referencias_profiles.xlsx](./doc/profiles_list.xlsx):
 
     ![planilha](./img/planilha.png)
 

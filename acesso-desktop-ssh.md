@@ -8,9 +8,9 @@
 ## 1. Introdução
 
 É fato que muitos usuários não se preocupam com isso e simplesmente instalam o Hermes Desktop diretamente no sistema de trabalho local, colocando desta forma sua privacidade em termos de documentos que tem arquivos sensíveis com senhas e informações confidenciais em risco. Por este motivo segue a descrição de uma forma segura de configuração que evita colocar em risco nosso ambient de trabalho, dando acesso ao Hermes somente o queremos que ele veja.
-As formas de configurar e trabalhar com o Hermes para impedir que os agentes acessem as pastas local do nosso sistema, que são:
-- Rodar o Hermes localmnte mas dentro de um Docker com configuração do workspace em modo docker, assim os agentes ficam confinados dentro do conteiner criado para eles
-- Rodar o Hermes em um servidor, assim ele tem acesso somente o que é gerado neste servidor, e mesmo assim podemos criar barreiras e impedir que ele acesse o sistema do servidor.
+As formas de configurar e trabalhar com o Hermes para impedir que os agentes acessem local do nosso sistema, são:
+- Rodar o Hermes localmnte mas dentro de um Docker com configuração do workspace em modo docker, com disponibilidade enquanto do PC estiver ligado, assim os agentes ficam confinados dentro do conteiner criado para eles.
+- Rodar o Hermes em um servidor, com disponibilidade 24/7, assim ele tem acesso somente o que é gerado neste servidor, e mesmo assim podemos criar barreiras e impedir que ele acesse o sistema do servidor.
 
 Nas duas opções podemos ainda aproveitar todos os recursos gráficos do Hermes Desktop para operar o Hermes no ambiente controlado, configurando desta forma os agentes do Hermes não rodam nem acessam diretamente a sua máquina local. Neste caso o Hermes Desktop atua apenas como um **cliente gráfico** (a interface de chat); o “cérebro” do agente (runtime, ferramentas, memória, credenciais e execução de comandos) fica no **backend**, que será o container dentro da sua propria máquina ou no servidor.
 
@@ -18,7 +18,7 @@ Abaixo, seguem o passo a passo para a conexão remota e para o compartilhamento 
 
 ---
 
-### 🔌 2. Passo a passo: conectar o Hermes Desktop ao servidor
+### 🔌 2. Conectar o Hermes Desktop ao servidor
 
 O objetivo é fazer o aplicativo no Windows “conversar” com o backend que está rodando no container da VM.
 
@@ -50,18 +50,7 @@ O objetivo é fazer o aplicativo no Windows “conversar” com o backend que es
 
 Como o Hermes está em um container Docker, o compartilhamento é feito via **bind mount** (montagem de diretório) do Docker. Você “espelha” uma pasta do sistema de arquivos da VM para dentro do container.
 
-**Opção A: Se você gerencia o container via `docker run`**
-Inclua a flag `-v` (ou `--mount`) no comando de inicialização. O formato é `-v /caminho/no/host:/caminho/no/container`.
-```bash
-# Exemplo: monta a pasta /home/ubuntu/hermes_shared da VM em /shared dentro do container
-docker run -d \
-  --name hermes \
-  -v /home/ubuntu/hermes_shared:/shared \
-  nousresearch/hermes-agent:latest
-```
-*   Use a opção `:ro` no final (ex.: `-v /host:/shared:ro`) se quiser que o container apenas leia os arquivos, sem modificá-los.
-
-**Opção B: Se você usa Docker Compose ou Dokploy**
+**Opção A: Se você usa Docker Compose ou Dokploy**
 Adicione a seção `volumes` no serviço do Hermes no arquivo `docker-compose.yml`. O Dokploy geralmente permite editar esse arquivo ou a configuração de volumes pela interface.
 ```yaml
 services:
@@ -72,6 +61,17 @@ services:
       - /home/ubuntu/hermes_data:/opt/data   # Diretório de dados persistentes do Hermes (recomendado)
 ```
 *   A pasta `/opt/data` é o local padrão onde o Hermes guarda configurações, sessões e memória; montá-la no host é essencial para não perder dados ao recriar o container.
+
+**Opção B: Se você gerencia o container via `docker run`**
+Inclua a flag `-v` (ou `--mount`) no comando de inicialização. O formato é `-v /caminho/no/host:/caminho/no/container`.
+```bash
+# Exemplo: monta a pasta /home/ubuntu/hermes_shared da VM em /shared dentro do container
+docker run -d \
+  --name hermes \
+  -v /home/ubuntu/hermes_shared:/shared \
+  nousresearch/hermes-agent:latest
+```
+*   Use a opção `:ro` no final (ex.: `-v /host:/shared:ro`) se quiser que o container apenas leia os arquivos, sem modificá-los.
 
 **⚠️ Atenção à permissão de arquivos:**
 Por padrão, o container roda como `root` (UID 0) e os arquivos criados na pasta compartilhada pertencerão ao `root` no host. Se você precisar editar esses arquivos na VM com seu usuário normal, pode:
