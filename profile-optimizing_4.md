@@ -406,36 +406,36 @@ Vamos seguir uma sequência de *implementação* e *validação*, em vez de inst
 
 1. **Configurar as ferramentas (tools)**
     Definir o que o agente pode executar, consultar, criar ou modificar.
-    [ ] Provider (router de modelos) e Modelo validados
-    [ ] Describe e SOUL.md revisados
-    [ ] Ferramentas necessárias habilitadas
+    - [ ] Provider (router de modelos) e Modelo validados
+    - [ ] Describe e SOUL.md revisados
+    - [ ] Ferramentas necessárias habilitadas
 
 2. **Configurar a memória**
     Preservar contexto útil, decisões, preferências e aprendizados.
-    [ ] Memória configurada
-    [ ] Memória testada
+    - [ ] Memória configurada
+    - [ ] Memória testada
 
 3. **Criar e selecionar Skills**
     Transformar procedimentos recorrentes em métodos reutilizáveis.
-    [ ] Skills essenciais criadas e validadas
-    [ ] Instruções operacionais definidas
+    - [ ] Skills essenciais criadas e validadas
+    - [ ] Instruções operacionais definidas
 
 4. **Definir regras de operação e segurança**
     Estabelecer limites, validações, permissões e condições de escalonamento.
-    [ ] Permissões e autonomia definidas
-    [ ] Credenciais protegidas
+    - [ ] Permissões e autonomia definidas
+    - [ ] Credenciais protegidas
 
 5. **Integrar sistemas e agentes**
     Configurar MCP, APIs, plugins e colaboração entre profiles quando necessário.
-    [ ] Selecionar MCPs e APIs, quando necessários
-    [ ] MCPs e APIs testado e validados
+    - [ ] Selecionar MCPs e APIs, quando necessários
+    - [ ] MCPs e APIs testado e validados
 
 6. **Testar, avaliar e monitorar**
     Verificar a qualidade das respostas, a execução de tarefas e o consumo de recursos.
-    [ ] Bateria de testes aprovada
-    [ ] Consumo de contexto e custo avaliados
-    [ ] Logs, backup e monitoramento planejados
-    [ ] Rotinas e delegação validadas, quando necessárias
+    - [ ] Bateria de testes aprovada
+    - [ ] Consumo de contexto e custo avaliados
+    - [ ] Logs, backup e monitoramento planejados
+    - [ ] Rotinas e delegação validadas, quando necessárias
 
 ---
 
