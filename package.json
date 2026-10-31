@@ -1,0 +1,27 @@
+{
+  "name": "hermes-instruction",
+  "version": "1.0.0",
+  "description": "![banner](./img/banner2.png)",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cpharles/hermes_referenceDoc.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Cpharles/hermes_referenceDoc/issues"
+  },
+  "homepage": "https://github.com/Cpharles/hermes_referenceDoc#readme",
+  "dependencies": {
+    "markdown-toc": "^1.2.0"
+  }
+}

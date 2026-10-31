@@ -11,13 +11,23 @@ Navegando na web eu pude entrontrar vários entusiastas de automação comentand
 Pensando nisso e partindo de uma necessidade pessoal, descidi documentar algumas aplicações de uso do Hermes Agent em projetos reais conforme eu vou estudando, tanto para minha consulta futura assim como, compartirlhar com outros que querem ter uma documentação prática com caso de uso.
 Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto de vista do que se trata e o que é o **Hermes Agent**.
 
-> ➩ Criando multiplos Profiles e controlando pelo Telegram: [multi_agent-Telegram.md](multi_agent-Telegram.md) <br>
-> ➩ Configurando a Identidade e a Descrição dos Profiles: [profile_identity_describe.md](profile_identity_describe.md) <br>
-> ➩ Configurando memória persistente: Em breve.
+| O que Configurar | Documento |
+|---|---|
+| 0. Check List de instalação: | [checklist-template.md](checklist-template.md) |
+| 1. Instalando Hermes Desktop p/ acessar Servidor: | [acesso-desktop-vps.md](acesso-desktop-vps.md) |
+| 2. Criando multi Profiles no Hermes: | [config_multi-profile.md](config_multi-profile.md) |
+| 3. Configurando a Identidade e a Descrição dos Profiles: | [profile_identity_describe.md](profile_identity_describe.md) |
+| 4. Criando a estrutura de Bots no Telegram: | [config-telegram.md](config-telegram.md) |
+| 5. Otimizando e subindo o nível do agente: | [profile-optimizing.md](profile-optimizing.md) |
+| 6. Configurando memória persistente: | [provider-memory.md](provider-memory) |
+| 7. Configurando Google Drive: | [config_google-cloude.md](config_google-cloude.md)
+
+</br>
 
 > **Documentação Oficial:**
-    - Pagina oficial do projeto no GitHub: [Hermes-Agent](https://github.com/NousResearch/hermes-agent)<br>
-    - Recomendo consultar a documentação oficial do Hermes Agent: [Docs](https://hermes-agent.nousresearch.com/docs)
+    - Página oficial NousResearch: [Hermes-Agent.Nousresearch](https://hermes-agent.nousresearch.com/) 
+    - Página oficial do projeto Hermes: [Hermes-Agent.GitHub](https://github.com/NousResearch/hermes-agent)<br>
+    - Recomendo consultar a documentação oficial do Hermes Agent: [Get Start](https://hermes-agent.nousresearch.com/docs)
 </br>
 
 ---
@@ -34,24 +44,24 @@ Um framework não é simplesmente uma aplicação pronta. Ele fornece uma estrut
 No Hermes, temos vários componentes que formam essa infraestrutura:
 
 ```text
-                    HERMES AGENT
-                         │
-        ┌────────────────┼────────────────┐
-        │                │                │
-      Agent            Memory           Skills
-        │                │                │
-        ├──── Tools ─────┤                │
-        │                │                │
-       MCP          Persistent          Procedural
-        │             Memory             Knowledge
-        │                │                │
-        └─────────── Execution ───────────┘
-                         │
-               ┌─────────┼─────────┐
-               │         │         │
-             Local     Docker     SSH
-               │
-          Cloud / VPS
+                               HERMES AGENT
+                                    │
+        ┌────────────────┬──────────┴────────┬─────────────────┐
+        │                │                   │                 │
+      Agent            Memory              Skills            Tools
+        │                │                   │                 │
+        │                │                   │                 │
+        │           ┌────┴────┐          Procedural       ┌────┴────┐
+        │       Built-in  Persistent     Knowledge      APIs      MCPs
+        │                   Memory                     
+        │                │                   │                 │        
+        │                │                   │                 │
+        └────────────────┴──────────┬────────┴─────────────────┘
+                                    │
+                                 Execution
+                          ┌─────────┼─────────┐
+                          │         │         │
+                        Local     Docker  Cloud / VPS
 ```
 
 ### 2. Conceito do Que é Agente

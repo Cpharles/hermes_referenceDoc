@@ -1,5 +1,33 @@
 # Configuração do Gateway Hermes Agent — Padrão Multiplex
 
+## Conteúdo
+
+<!-- toc -->
+
+- [Visão Geral](#visao-geral)
+- [Cenário do Guia](#cenario-do-guia)
+- [Step 1. Verificar o config.yaml do perfil default](#step-1-verificar-o-configyaml-do-perfil-default)
+- [Step 2. Criar o profile adicional](#step-2-criar-o-profile-adicional)
+- [Step 3. Configurar o Telegram no config.yaml do profile](#step-3-configurar-o-telegram-no-configyaml-do-profile)
+- [Step 4. Migrar os Gateways para um Gateway](#step-4-migrar-os-gateways-para-um-gateway)
+  * [Como habilitar explicitamente](#como-habilitar-explicitamente)
+  * [Somente para Windows (Scheduled Task / Startup)](#somente-para-windows-scheduled-task--startup)
+    + [Opção A — Instalar via comando Hermes (recomendado)](#opcao-a--instalar-via-comando-hermes-recomendado)
+    + [Opção B — Registar manualmente no Startup folder](#opcao-b--registar-manualmente-no-startup-folder)
+    + [Verificar se está registado](#verificar-se-esta-registado)
+- [Step 5. Iniciar o Gateway](#step-5-iniciar-o-gateway)
+- [Step 6. Migrar para o Padrão Multiplex](#step-6-migrar-para-o-padrao-multiplex)
+  * [O que muda no config.yaml da raiz após migração](#o-que-muda-no-configyaml-da-raiz-apos-migracao)
+- [Step 7. Verificar o Status](#step-7-verificar-o-status)
+- [Para Criar Novos Profiles no Futuro](#para-criar-novos-profiles-no-futuro)
+- [Troubleshooting](#troubleshooting)
+  * [Gateway não sobe / crash na inicialização](#gateway-nao-sobe--crash-na-inicializacao)
+  * [Um profile não está sendo servido](#um-profile-nao-esta-sendo-servido)
+  * [Desfazer a migração (se necessário)](#desfazer-a-migracao-se-necessario)
+- [Resumo dos Comandos](#resumo-dos-comandos)
+
+<!-- tocstop -->
+
 ## Visão Geral
 
 O **gateway** é o processo que mantém conexão com as plataformas de mensageria (Telegram, Slack, Discord, etc.) e recebe/envia mensagens. A partir da versão que introduziu o **multiplex**, um único gateway host pode servir múltiplos perfis ao invés de cada profile ter seu próprio gateway rodando isoladamente.

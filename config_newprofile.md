@@ -1,0 +1,197 @@
+# CONFIGURANDO OS PROFILES NO HERMES
+
+## Conteúdo
+
+<!-- toc -->
+
+- [1. Criando Profiles Hermes](#1-criando-profiles-hermes)
+  * [Definindo o tipo de protocolo do gateway](#definindo-o-tipo-de-protocolo-do-gateway)
+  * [Step 1. Preparando as Variáveis do Profile](#step-1-preparando-as-variaveis-do-profile)
+- [Step 2. Reativando os Gateways dos Profiles](#step-2-reativando-os-gateways-dos-profiles)
+  * [⟹ Para sistemas operacionais Windows utilize:](#%E2%9F%B9-para-sistemas-operacionais-windows-utilize)
+  * [⟹ Para sistemas operacionais Linux utilize:](#%E2%9F%B9-para-sistemas-operacionais-linux-utilize)
+
+<!-- tocstop -->
+
+## 1. Criando Profiles Hermes
+
+Quando fazemos a instalação do Hermes Agent obrigatoriamente temos que configurar um **profile default** que é a primeira solicitação do Hermes. Seguindo o passo a passo fornecido pelo instalador, então, receber algumas perguntas de confirmações para fornecer algumas informações.
+Caso vc já tenha instalado e tenha vários profiles, não é necessário desistalar, apenas escolha o profiles de preferencia se possível o primeiro que foi criado para ser **definido como agente default**. E porque dissso?; Simplesmente poque o primeiro profile criado que é chamado de default cria toda a sua estrutura de pastas na raiz do Hermes, e consequentemente este profile poderá ser utilizado como (clone) base para criação de outros profiles.</br>
+Temos várias forma de criar novos profiles, utilizando a própia plataforma do Hermes (App) ou via terminal com comandos.
+Existe uma tendência de evitar a utilização de comandos via terminal, mas através dos comando temos muitas opções de configuração que o App ainda não conseguiu fornecer na sua plenitude (até a data deste documento). Então para termos uma melhor cobertura do que queremos, as instruções seguiram via comando, e para facilitar a criação do profile vamos rodar um script no terminal para completar as configuração.
+> [!NOTE]
+> Antes de proceguir entenda o que o script faz, leia os seguinte arquivo:
+>
+> ⇒ [explicando_script_create-profile.md](./scripts/explicando_script_create-profile.md)
+>
+> Ou exponha estes arquivos para uma IA e peça as explicações e verificações de segurança.
+
+> [!TIP]
+> Lembre que se for trabalhar com vários profiles e o ideal é configurar um gateway multiplexido, pois desta forma facilita o gerenciamento do gateway, pois os gateways ficam legado a apenas um PID, ou seja, compartilham do mesmo gateway do perfil default.
+
+Para saber a insformação do seu profile default vamos executar:
+
+1. Abra o terminal **Git Bash** ou o terminal CLI local do seu VPS na seção do Hermes.
+    ( obs.: para acessar o terminal Git Bash é necessário ter o [Git instalado](https://git-scm.com/install/windows) ).
+2. Execute o seguinte comando no terminal:
+
+    ```bash
+    hermes profile list
+    ```
+
+    Podemos verificar que temos inicialmente somente o profile padrão que é chamado de **default**. Este profile é criado na primeira vez que você instala o Hermes Agent.
+
+    ![status1](./img/status_profile1.png)
+    </br>
+
+    Nosso objetivo é no final da configuração dos profiles termos uma estrutura:
+
+    ```text
+                 default
+                    │
+            ~/AppData/Local/hermes/
+                    │
+            ┌───────┴────────┐
+            │                │
+          GLOBAL          profiles/
+            │                │
+            │                ├───────────────────────────┬────────────┬...
+         default          Agente1/                    Agente2/
+            │                │                           │
+          .env             .env                        .env
+       config.yaml      config.yaml                 config.yaml
+         SOUL.md          SOUL.md                     SOUL.md
+            │                 │                           │
+            │              Telegram                    Telegram
+            │                 │                           │
+            ▼                 ▼                           ▼
+        gateway run       gateway run                 gateway run
+            │                 │                           │
+            ▼                 ▼                           ▼
+          running          running                     running
+    ```
+
+### Definindo o tipo de protocolo do gateway
+
+Antes de criarmos os profiles de cada agente dentro do Hermes, temos que entender a diferença entre o protoloco **gateway single-channel e multiplex**.
+Para uma aplicação de automação com conectores (chamado também de **Plataformas**) que tem ação externa e portanto vão ter request via API, o **gateway com protocolo single channel** atende perfeitamente quando temos apenas um agente interagindo (fazendo request) com a plataforma, mas quando vamos trabalhar com multiplos agentes, e estes agentes também vão fazer request para a mesma plataforma, neste caso o ideal é utilizar o **gateway com protocolo multiplex**.
+É justamente o nosso caso, pois estaremos utilizando a plataforma Telegram para fazer a interação com multiplos agentes.
+Vamos pausar um pouco aqui e seguir em outro documento, onde temos a explicação da diferença entre os protocolos e como implantar **gateway multiplexado**.
+
+:books: ⇒ Abra o arquivo [config_gw_multiplex.md](config_gw_multiplex.md)</br>
+
+Caso a sua aplicação tenha apenas um **único agente** interagindo com a plataforma, o recomendado é utilizar o **gateway single-channel protocol**, neste caso simplesmente ignore a configuração de gateway multiplex e continue neste documento
+
+
+---
+---
+
+### Step 1. Preparando as Variáveis do Profile
+
+1. Agora abra o arquivo [create-profile.sh](./scripts/create-profile.sh) em um editor de código (IDE) de sua preferência:
+    Este são alguns exemplos, mas tem uma dezena de IDE para códigos (todos free)
+
+    * [Visual Studio Code_MicroSoft](https://code.visualstudio.com/download?_exp_download=fb315fc982)
+    * [Antigravity IDE_Google](https://antigravity.google/product/antigravity-ide)
+    * [NotePad++](https://notepad-plus-plus.org/downloads/)
+    </br>
+
+    No inicio do script temos o bloco de variáveis que devemos alterar para cada profile, portanto edite este trecho do código e coloque as informações necessárias solicitada. (use a planilha [profile_list.xlsx](./profiles_list.xlsx) para auxiliar).
+    Exemplo:
+
+    ```text
+    PROFILE_NAME_RAW="<name>"               # Nome do profile
+    CHANNEL_NAME="<bot_name>"               # Nome amigável do bot (TELEGRAM_HOME_CHANNEL_NAME)
+    USER_ID="<ID_number>"                   # User ID do Telegram (DM) — pode adicionar vários separando por ,
+    DIRETORIO_HERMES="<local_do_hermes>"    # Caminho onde está o diretório do Hermes (geralmente em $HOME/AppData/Local/hermes para Windows)
+    ```
+
+2. Salve o arquivo e depois retorne ao terminal Bash;
+3. Navegue pelo terminal até a pasta onde se encontra o script;
+4. Execute o script com o seguinte comando:
+    > [!NOTE]
+    > **Obs**.: Como não adcionamos o BOT_TOKEN ao script, vamos primeiramente carregar uma variável de ambiente para o shell para ser usado pelo script. Desta forma garantimos que o TOKEN não fique acidentalmente salvo no script e após a execução esta variável de ambiente é esvasiado, garantindo também que não ficou no terminal.
+
+    ```bash
+    export TELEGRAM_BOT_TOKEN="<cole aqui o seu BOT_TOKEN>"
+    ```
+
+    Confirme com \<ENTER>, e execute o script com o comando:
+
+    ```bash
+    bash create-profile.sh
+    ```
+
+5. Aguarde o processo finalizar acompanhando os outputs no terminal;
+6. Caso queira criar mais profiles, abra novamente o arquivo `create-profile   .sh` e altere os dados para o próximo agente e repita a execução do script;
+7. Continue repetindo este processo até cadastrar todos os profiles.
+8. Para conferirmos se todos os agentes foram cadastrados no Hermes, execute novamente o comando no terminal:
+
+    ```bash
+    hermes profile list
+    ```
+
+    Vamos ter algo como:
+
+    ![status2](./img/status_profile2.png)
+
+---
+
+> [!NOTE]
+> Caso esteja vindo do arquivo de instrução, como configurar o gateway multiplex (config_gw_multiplex.md), onde é utilizando a configuração do gateway com protocolo **multiplex**, não será necessário a execução das próximas etapas. Retorne para a instrução [configuração do gateway multiplex](config_gw_multiplex.md) e continue a partir de lá.
+> As etapas seguintes se destina a gateway com protocolo **single-channel**.
+
+---
+
+## Step 2. Reativando os Gateways dos Profiles
+
+> [!NOTE]
+Para ambiente windows localmente após a restart do gateway via terminal não podemos fecha-lo, caso contrário os processos dos gateways serão encerrados, pausando dos agentes.
+
+Sempre que você estiver rodando em uma VPS em ambiente Linux/Windows será necessário a reativação dos gateways para os profiles de forma manual sempre que:
+
+* Atualizar o Hermes Agent
+* Precisou parar o Hermes por algum motivo
+* O servidor (VPS) foi reiniciado
+
+Antes de resetar os processos do gateway podemos primeiramente executar o comando (`hermes profile list`) para verificar se os gateways estão com status **running** ou **stopped**.
+
+```text
+              Hermes Gateway
+                    │
+                    │
+          ┌─────────┴─────────┐
+          │                   │
+       default             profiles...
+       stopped             stopped
+```
+
+Para forçarmos a reativação dos gateway abra o terminal e execute o comando para cada profile ou execute o script:
+
+### ⟹ Para sistemas operacionais Windows utilize:
+
+1. Executando por comando para cada profile.
+
+    ```bash
+    hermes -p <profile_name> gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
+    sleep 8
+    hermes gateway list
+    ```
+
+2. Executando por Script -> [wakeup-gateway_win.sh](./scripts/wakeup-gateway_win.sh)
+3. E para ver as portas que cada Gateway esta rodando utilize o comando `hermes gateway list`.
+</br>
+    ![statusgateway](./img/status_profile3.png)
+
+### ⟹ Para sistemas operacionais Linux utilize:
+
+1. Executando por comando para cada profile.
+
+    ```bash
+    setsid hermes -p <profile_name> gateway run --replace > /tmp/<profile_name>-gateway.log 2>&1 &
+    sleep 8
+    hermes gateway list
+    ```
+
+2. Executando por escript -> [wakeup-gateway_lin.sh](./scripts/wakeup-gateway_lin.sh)
+3. E para ver as portas que cada Gateway esta rodando utilize o comando `hermes gateway list`
