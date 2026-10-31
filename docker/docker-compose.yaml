@@ -9,6 +9,7 @@ services:
     ports:
       - "9119:9119"   # Dashboard (acesso local via navegador)
       - "8642:8642"   # Gateway API (opcional, para clientes externos)
+      - "27890:27890" # Google Chat Callback
     environment:
       - HERMES_DASHBOARD=${HERMES_DASHBOARD}
       - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${HERMES_DASHBOARD_BASIC_AUTH_USERNAME}
