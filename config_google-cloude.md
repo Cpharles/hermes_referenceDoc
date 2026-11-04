@@ -5,8 +5,6 @@
 
 <!-- tocstop -->
 
-> **Antes de começar:** Além disso, o Hermes avisa que o Google Drive não aceita o cadastro OAuth automático: é preciso criar um cliente OAuth próprio. [Google: configuração dos servidores MCP](https://developers.google.com/workspace/guides/configure-mcp-servers) · [Hermes: integração MCP e Google Drive](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp)
-
 ## API Vs MCP
 
 **API**:
@@ -37,9 +35,17 @@ O servidor MCP `drivemcp.googleapis.com` tem os seguintes conjuntos de ferrament
 | Endpoint | Descrição | Ferramentas |
 | /mcp/v1 |	Conjunto de ferramentas para o serviço MCP do Drive. | copy_file <br> create_file <br> download_file_content <br> get_file_metadata <br> get_file_permissions <br> list_recent_files <br> read_file_content <br> search_files |
 
+   <div align="left">
+     <img width="600" title="api-drive9" src="./img/api-drive9.jpg" style="margin-right: 50px; vertical-align: top;"/>
+     <img width="600" title="api-drive8" src="./img/api-drive8.png"/>
+   </div><br>
+
+
 ---
 
 ## Step 1 — Criando Projeto no Google Cloude
+
+> **Antes de começar:** Além disso, o Hermes avisa que o Google Drive não aceita o cadastro OAuth automático: é preciso criar um cliente OAuth próprio. [Google: configuração dos servidores MCP](https://developers.google.com/workspace/guides/configure-mcp-servers) · [Hermes: integração MCP e Google Drive](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp)
 
 1. **Acessando a Google Cloud Platform**  
    Acesse [Google Cloud](https://cloud.google.com/), faça o login
@@ -99,6 +105,19 @@ Acesse novamente o menu lateral esquerdo em `GOOGLE CLOUD -> APIs e serviços ->
    </div><br>
 
 > [!WARNING] Não revele estas informações é um Token de acesso
+
+*O que significa cada variável no arquivo json*
+:   Verifiquei a **estrutura** do arquivo sem mostrar os valores das credenciais. Ele é um JSON de cliente OAuth do tipo `installed` (“aplicativo instalado”) e contém:
+
+| Campo | O que significa | Precisa entrar no `config.yaml`? |
+|---|---|---|
+| `client_id` | Identifica o cliente OAuth criado no Google Cloud. | Sim, como referência a uma variável no `.env`. |
+| `client_secret` | Segredo usado pelo cliente durante o OAuth. | Sim, também por referência ao `.env`. |
+| `project_id` | Identifica o projeto no Google Cloud. | Não, não é usado nesse bloco de conexão do Hermes. |
+| `auth_uri`, `token_uri` | Endereços do Google para iniciar e concluir o fluxo OAuth. | Não; o Hermes usa a configuração OAuth e trata o fluxo. |
+| `auth_provider_x509_cert_url` | Endereço de certificados públicos do provedor OAuth. | Não. |
+| `redirect_uris` | Endereços para onde o Google devolve o navegador após a autorização. | Não se copia como campo do Hermes; precisa corresponder ao redirecionamento configurado no Hermes. |
+
 
 6. **Status de publicação**
 Vamos configurar um usuário como teste, pois não vamos publicar este app, será para uso interno, temos que informar qual será o **Publico auvo**.
@@ -186,4 +205,11 @@ Vamos configurar um usuário como teste, pois não vamos publicar este app, ser�
 - **Você não encontra os serviços MCP no Google Cloud:** confirme a inscrição na prévia e se escolheu o projeto certo.
 
 O Hermes avisa que uma conexão pode parecer instalada mesmo quando a autenticação não terminou; por isso, o teste final é pedir uma leitura real ao Drive. Para sua conta, recomendo começar com **Drive e Docs**, e conectar Gmail ou Calendar só depois de confirmar que essa etapa funciona.
+
+___
+
+## Tendo acesso pelo Composio
+
+https://composio.dev/toolkits/googledrive/framework/hermes-agent
+
 

@@ -260,6 +260,11 @@ Caso o agente não esteja retornando ou mesmo alguma mensagem de erro, verifique
 
 Depois tente novamente mandar a mensagem.
 
+
+## 4. Hermes Agent não responde no Telegram: soluções rápidas
+
+Configurado e mesmo asim o Bot não responde [Doc](Troubleshooting-telegram.md)
+
 ---
 
 ## Resumo de Comandos

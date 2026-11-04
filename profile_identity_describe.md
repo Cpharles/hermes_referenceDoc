@@ -12,6 +12,23 @@
 
 <!-- tocstop -->
 
+Hermes tem diferentes tipos de **Contexto** que pode ser fornecido ao agente é importante entendermos onde e quando usar. 
+
+> [!TIP]
+> :brain: [Arquivo de Contexto Suportado](https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files#supported-context-files)
+
+Entre os arquivos de Contexto Suportado, temos:
+
+| Tipo de Arquivo | Proposta | Fornecido |
+|---|---|---|
+| hermes.md / HERMES.md | Instruções do projeto (prioridade máxima) | Caminhadas até git root |
+| AGENTS.override.md | Sobreposição pessoal, por diretório, do AGENTS.md (normalmente gitignorada) | CWD na startup + subdiretórios progressivamente |
+| AGENTS.md | Instruções do projeto, convenções, arquitetura | CWD na startup + subdiretórios progressivamente |
+| CLAUDE.md | Arquivos de contexto Claude Code (também detectados) | CWD na startup + subdiretórios progressivamente |
+| SOUL.md | Personalização global de personalidade e timbre para esta instância da Hermes | HERMES_HOME/SOUL.md só |
+| .cursorrules | Convenções de codificação do IDE com cursor | Apenas CWD |
+| .cursor/rules/*.mdc | Módulos de regras do cursor IDE | Apenas CWD |
+
 ## Entendendo a diferença entre "Identidade" e "Descrição"
 
 Quando criamos os profiles o proprio Hermes já se encarrega de criar tanto a **Identidade** (Personalidade/Identidade) como a **Descrição** para o novo Agente (Profile). No caso da identidade, basicamente ele copía do profile **default** que é uma identidade genérica. Já para a descrição o Hermes presume a partir da analise do nome, mas nem sempre é realmente o que queremos. Portanto a melhor forma de termos controle sobre como o agente vai trabalhar é dando uma boa identidade e descrição de sua função, quase como a descrição de cargos e funções dentro de uma empresa.
@@ -20,6 +37,8 @@ Em um sistema multi-agente como o Hermes, um **Profile** é a configuração com
 Ele possui dois componentes distintos que operam em níveis diferentes do sistema:
 
 ### 1. Identidade (SOUL.md) — quem o agente *é***
+
+AGENTS.md é o principal arquivo de contexto do projeto. Ele informa ao agente como seu projeto está estruturado, quais convenções seguir e quaisquer instruções especiais.
 
 > [!TIP]
 > :brain: **Documentação oficial:**  [Identidade - SOUL.md](https://hermes-agent.nousresearch.com/docs/user-guide/features/personality)
@@ -43,15 +62,16 @@ Ele possui dois componentes distintos que operam em níveis diferentes do sistem
 - Nunca entra no prompt do modelo — o agente não conhece a própria descrição;
 - Formato: arquivo yaml (`~/.hermes/profiles/<profile_name>/profile.yaml`), ideal que seja no máximo em 2 frases.
 - Impacta diretamente a **eficiência da delegação** de tarefas.
+</br>
 
 | Arquivo | O que guarda |
 |---|---|
 | `SOUL.md` | Identidade completa do agente (personalidade, instruções, limites) — slot #1 do system prompt |
 | `profile.yaml` | Descrição curta (1-2 frases) para roteamento do orquestrador |
 
-**Síntese em uma frase:**
-> **Identidade** é a persona operacional que o modelo executa;<br>
-> **Descrição** é o rótulo de especialidade que o sistema usa para distribuir trabalho.
+*Síntese em uma frase:*
+: **Identidade** é a persona operacional que o modelo executa;<br>
+ **Descrição** é o rótulo de especialidade que o sistema usa para distribuir trabalho.
 
 **Consequência prática:**
 As duas devem ser consistentes — a descrição promete uma especialidade (ex.: "otimiza campanhas focando em ROI e CPA") que a identidade precisa saber cumprir. Uma descrição inflada com competências ausentes no SOUL.md gera roteamento correto mas execução ruim; o inverso, um ótimo agente subutilizado porque o orquestrador não sabe delegar a ele.

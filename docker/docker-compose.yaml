@@ -19,6 +19,8 @@ services:
       - API_SERVER_HOST=${API_SERVER_HOST}
       - API_SERVER_KEY=${API_SERVER_KEY}
       - GH_TOKEN=${GH_TOKEN}   # para usar no GitHub CLI
+      - TZ=America/Sao_Paulo   # fuso horário do container
+      - HERMES_TIMEZONE=America/Sao_Paulo   # fuso horário para o Hermes
     volumes:
       - hermes_data:/opt/data
       - /mnt/vbox_global:/shared_data # compartilhamento da pasta global (somente para aplicação homelab local)

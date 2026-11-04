@@ -14,7 +14,7 @@
   * [3 Apontamento do Diretorio para nosso Workspace](#3-apontamento-do-diretorio-para-nosso-workspace)
 - [3. Versionamento de Documentos](#3-versionamento-de-documentos)
   * [1. Recurso exigido](#1-recurso-exigido)
-  * [2 Instando GitHub CLI para o Hermes dentro do conteiner](#2-instando-github-cli-para-o-hermes-dentro-do-conteiner)
+  * [2 Instando GitHub CLI para o Hermes dentro do container](#2-instando-github-cli-para-o-hermes-dentro-do-container)
     + [Passo 1: Escrever o Dockerfile](#passo-1-escrever-o-dockerfile)
     + [Passo 2: Preparar os arquivos no repositório Git](#passo-2-preparar-os-arquivos-no-repositorio-git)
     + [Passo 3: Configurar o docker-compose.yml no Dokploy](#passo-3-configurar-o-docker-composeyml-no-dokploy)
@@ -222,32 +222,36 @@ E para garantir este fluxo vamos adotar o seguinte critério inicial:
 <br>
 
 ### 1. Recurso exigido
-Temos que verificar se já temos instalado em nosso sistema o *git* e o *GitHub CLI*
+Temos que verificar se já temos instalado em nosso sistema o *git* e o *GitHub CLI* dentro do container do Hermes
 
 ```bash
+docker ps
+docker exec -it <docker_id> /bin/bash
 git --version   # verifica a existencia do git
 gh --version    # verifica a existência do gh cli
 ```
 
-* para instalação do [Git](https://git-scm.com/)
-* para a instalação do [GitHub CLI](https://cli.github.com/)
+*Documentação para referência e consulta:*
+:  * para instalação do [Git](https://git-scm.com/)
+  * para a instalação do [GitHub CLI](https://cli.github.com/)
+  * Guia e Turorial: [GitHub - PRs](https://hermes-agent.nousresearch.com/docs/guides/github-pr-review-agent)
 
 > [!WARNING]
-> Se o Hermes esta rodando em um conteiner docker a instalação do GitHub CLI deve ser feito por outro caminho.
+> Se o Hermes esta rodando em um container docker, que é o padrão, a instalação do GitHub CLI deve ser feito por outro caminho.
 
 <br>
 
-### 2 Instando GitHub CLI para o Hermes dentro do conteiner
+### 2 Instando GitHub CLI para o Hermes dentro do container
 
 O cenário que temos é (**VM Ubuntu → Dokploy → contêiner Hermes**), para instalarmos o GitHub CLI dentro do contêiner Hermes podemos fazer de duas formas:
 
-1. através da construir uma imagem derivada (**derived image**)
-2. alterando o arquivo docker-compose.yaml e substituindo a função de **image:** por **build:**, garantindo que o Dockerfile com a instalação do gh esteja no mesmo repositório.
+1. reconstruir manualmente uma imagem derivada (**derived image**) a partir da imagem já instalada
+2. alterando o arquivo docker-compose.yaml e substituindo a função de **image:** por **build:**, garantindo que o Dockerfile execute a instalação do gh no mesmo repositório.
  tem duas considerações principais: como o `gh` não vem pré-instalado na imagem oficial, o método mais confiável é construir uma imagem derivada (derived image).
 
 *Qual escolher?*
-Na opção 1 basicamente é recriar a imagem com uma alteração, mas de forma manual e portanto teremos o inconveniente de termos que recriar esta imagem todas as vezes que for necessário a atualização ou um novo redeploy da aplicação.
-Agora para deixarmos de forma automática, podemos incluir a instrução **build:** no arquivo docker-compose. Portanto vamos escolher a opção 2.
+:   **Na opção 1**, basicamente é recriar a imagem com uma alteração, mas de forma manual, tendo o inconveniente de recriar esta imagem todas as vezes que for necessário a atualização ou um novo redeploy da aplicação.
+:   **Na opção 2**, deixarmos a reconstrução de forma automática, incluindo a instrução **build:** ao invés de **image** no arquivo docker-compose. **Vamos escolher a opção 2**
 <br>
 
 #### Passo 1: Escrever o Dockerfile
@@ -323,13 +327,21 @@ services:
     # ... outras configurações (redes, portas, etc.) que você já tinha
 ```
 
-O que mudou e por quê:
-- **build:** substitui o **image:**. O Dokploy vai construir a imagem usando seu Dockerfile.
-- apontamento do Token do GitHub para variável de ambiente.
+*O que mudou e por quê:*
+:   **build:** substitui o **image:**. O Dokploy vai construir a imagem usando seu Dockerfile.
+ agora o apontamento do Token do GitHub para variável de ambiente.
 
 > [!WARNING]
 > Para o apontamento da **variável de ambiente** para o **GH_TOKEN**, registramos na opção **Enviroment** dentro do aplicativo no Dokploy:
 
+> [!NOTE]
+> **Dúvidas**
+> A primeira coisa que podemos perguntar é: Mas se eu já instalei usando o docker com uma imagem e tenho que criar uma imagem derivada, será que terei que fazer tudo do zero as configurações dos meus agentes?; Será que vou perder tudo que fiz até agora?
+> A resposta é **NÃO**
+
+*Por que não perdemos que já fizamos com a reconstrução de uma imagem derivada?*
+:   Reconstruir a imagem derivada não causará perda dos dados do agente. A chave está em: os dados de estado do Hermes (configuração, memórias, sessões, habilidades, etc.) não são armazenados na camada da imagem, mas sim no volume persistente /opt/data (linux). A reconstrução da imagem só substitui a árvore de código em /opt/hermes; o volume de dados é preservado durante a recriação do contêiner.
+ A imagem em si é somente leitura e imutável (/opt/hermes pertence ao root, e o usuário de execução não pode modificá-la). A reconstrução da imagem derivada só altera a camada do sistema onde o gh está instalado; não afeta o /opt/data.
 <br>
 
 #### Passo 4: Configurar o apontamento dos arquivos no Dokploy
@@ -371,10 +383,10 @@ Agora vamos retornar para o nosso projeto em "Project" no menu do lado esquerdo,
 <br>
 
 #### Passo 5: Permissão de Gerenciamento do Versionamento no GitHub
-Para darmos acesso ao nosso agente para gerenciar o sistema de versionamento montado no GitHub, vamos precisar autenticar (permitir) que o GitHub CLI tenha acesso ao GitHub pelo agente para executar comandos de versionamento. Como nosso ambiente é headless (sem navegador ou seja um servidor), a forma mais recomendada é usar um **Personal Access Token (PAT)** através da variável de ambiente GH_TOKEN inserido no "**Enviroment**" do Dokploy.
+Para darmos acesso ao nosso agente para gerenciar os documenos do nosso projeto no sistema de versionamento montado no GitHub, vamos precisar autenticar (permitir) que o GitHub CLI tenha acesso ao GitHub pelo agente para executar comandos de versionamento. Como nosso ambiente é headless (sem navegador ou seja um servidor), a forma mais recomendada é usar um **Personal Access Token (PAT)** através da variável de ambiente GH_TOKEN inserido no "**Enviroment**" do Dokploy.
 Para este projeto estarei criando um novo repositório privado, por se tratar de documentação versionada de acesso restrito ao projeto.
 
-**Gerando Token de acesso ao GitHub**
+##### Passo 1: Gerando Token de acesso ao GitHub
 1. Faça login na sua conta do GitHub
 2. Clique na sua foto do perfil no canto superior direito da página e selecione "**Settings**" (Configurações) no menu suspenso.
 3. Na barra lateral esquerda, clique em "**Developer settings**" (Configurações de desenvolvedor)
@@ -393,7 +405,7 @@ Para este projeto estarei criando um novo repositório privado, por se tratar de
           <img width="600" title="gh14" src="./img/gh14.png"/>
         </div><br>
 
-**Injetando o Token no Conteriner Hermes**
+##### Passo 2: Injetando o Token no Conteriner Hermes
 Não é preciso fazer login interativo com gh auth login dentro do contêiner. A documentação oficial do GitHub CLI afirma claramente que, para uso em automação/headless, recomenda-se usar diretamente a variável de ambiente GH_TOKEN.
 
 1. No painel do Dokploy, entre na aplicação do tipo Docker Compose do Hermes.
@@ -404,7 +416,7 @@ Não é preciso fazer login interativo com gh auth login dentro do contêiner. A
 4. Salve e faça Deploy do serviço. Após a reinicialização do contêiner, o processo gh lerá automaticamente o GH_TOKEN do ambiente para completar a autenticação.
 <br>
 
-#### Passo 6: Verificar a Autenticação
+##### Passo 3: Verificar a Autenticação dentro do Container
 1. Entre no contêiner Hermes (via terminal do Dokploy ou `docker exec -it <nome_do_contêiner> /bin/bash`) e execute:
 ```bash
 gh auth status
@@ -429,16 +441,58 @@ Controle e gestão de documentos....
 
 View this repository on GitHub: https://github.com/Cpharles/<nome_do_repositório_privado>
 ```
-Se as informações do repositório forem exibidas normalmente, o gh está pronto para operar o repositório de documentos.
+Se as informações do repositório forem exibidas normalmente, o gh está pronto dentro do container, agora temos que fazer o apontamento desta autorização ao agente que vai operar o repositório de documentos.
+<br>
 
-> [!NOTE]
-> **Dúvidas**
-> Antes mesmo de executar os comando, a primeira coisa que podemos perguntar é: Será que terei que fazer tudo do zero as configurações dos meus agentes?; Será que vou perder tudo que fiz até agora?
-> A resposta é **NÃO**
+##### Passo 4: Liberando acesso a um agente no GitHub CLI
 
-Por que não perdemos que já fizamos com a reconstrução de uma imagem derivada?
- Reconstruir a imagem derivada não causará perda dos dados do agente. A chave está em: os dados de estado do Hermes (configuração, memórias, sessões, habilidades, etc.) não são armazenados na camada da imagem, mas sim no volume persistente /opt/data (linux). A reconstrução da imagem só substitui a árvore de código em /opt/hermes; o volume de dados é preservado durante a recriação do contêiner.
- A imagem em si é somente leitura e imutável (/opt/hermes pertence ao root, e o usuário de execução não pode modificá-la). A reconstrução da imagem derivada só altera a camada do sistema onde o gh está instalado; não afeta o /opt/data.
+*Entendendo porque temos que fazer esta configuração:*
+:   Bem, a resposta é simples, na configuração anterior, nós só instalamos o GitHub CLI - `gh` dentro do container do Hermes onde o gh grava a auth em `$HOME/.config/gh/hosts.yml`, o login no container está no ambiente do root (GH_TOKEN no env do shell root), já para o perfil de um agente o `gh` tem que roda em `HOME=/opt/data/profiles/agente_name/home`, portanto são `HOMEs` diferentes . 
+ Até este ponto nós temos a autenticação no root mas ainda não esta diponível para algum agente utilizar. Para que o agente possa ter acesso a esta ferramenta (Tool) temos que criar um **link simbólico (symlink)** apontando para o diretório do agente. Podemos afirmar que temos uma configuração **com uma camada de segurança**, impedindo que acidentalmente algum agente tenha acesso a esta ferramenta, pois somente o agente que tiver este symlink poderá utilizar esta tool.
+
+* Libera o gh para o agente:
+1. Certifique-se de estar com o perfil do agente ativado antes de iniciar.
+2. Abra o terminal no diretório do Hermes (root) `$HOME/./opt/data/`
+3. Exporta o token de autenticação do gh root para um arquivo temporário com permissão exclusiva para o uid do agente escolhio:
+```bash
+id hermes
+gh auth token | install -m 600 -o <id_hermes> -g <id_hermes> /dev/stdin /opt/data/profiles/profile_name/home/.gh_token_import
+ls -la /opt/data/profiles/profile_name/home/.gh_token_import   # tem que aparecer: -rw------- hermes hermes
+```
+*Obs.:*
+:   estando dentro do container não é necessário utilizar `gh auth token | sudo install...`, do contrario é necessário.
+
+*O que este comando faz:*
+:  * `gh auth token` imprime o token que o gh está usando no ambiente atual — no seu caso, provavelmente a autenticação do root.
+  * `|` envia esse texto como entrada para o próximo comando.
+  * `install ... /dev/stdin ...` tenta criar o arquivo .gh_token_import a partir dessa entrada.
+  * `-m 600` define a permissão como leitura e gravação apenas para o dono.
+  * `-o <id_hermes> -g <id_hermes>` define o dono e o grupo pelo ID hermes.
+  * O segundo comando lista o arquivo para conferir se foi criado e quais permissões e proprietário ele tem.
+
+4. Fazer o apontamento da autorização para o diretório do agente, assim, o gh grava a autenticação e a configuração do Git nesse perfil
+```bash
+gh auth login --with-token < /opt/data/profiles/profile_name/home/.gh_token_import
+gh auth setup-git          # git passa a usar `gh auth git-credential` no MY gitconfig
+rm /opt/data/profiles/profile_name/home/.gh_token_import   # apago o arquivo de importação
+gh auth status             # verificação
+```
+*O que cada comando faz:*
+:  * `gh auth login --with-token < ...` lê o token do arquivo e salva a autenticação do GitHub no HOME atual, normalmente em `/opt/data/profiles/profile_name/home/.config/gh/hosts.yml`.
+  * `gh auth setup-git` configura o Git desse agente (usuário) para usar o gh como auxiliar de credenciais. Isso permite que operações Git autenticadas, como git push e git fetch, usem o login do gh.
+  * `rm ...` apaga o arquivo temporário que continha o token.
+  * `gh auth status` confirma se o gh está autenticado. Não compartilhe a saída se ela mostrar informações sensíveis.
+
+✅ Autenticação gh — liberada somente para este perfil
+| Item | Estado |
+|---|---|
+|Arquivo temporário .gh_token_import |	Criado com -rw------- hermes hermes, usado uma vez via stdin e apagado ✅ |
+|Auth do gh |	Logged in to `github.com account <repo_name>` — gravada em `/opt/data/profiles/profile_name/home/.config/gh/hosts.yml` (permissão 600, só no meu HOME de perfil) ✅ |
+|Git credential helper |	Escopado a `https://github.com` e `gist.github.com` via `!/usr/bin/gh auth git-credential` — o token não está em `.git/config`, nem no repo ✅ |
+|Teste pós-limpeza	| git ls-remote origin funcionando ✅ |
+
+> [!WARNING]
+> O token fica persistido apenas nesse HOME de perfil — próximas sessões do docvet_keeper já funcionarão sem reimportar; os outros perfis continuam sem acesso.
 
 ---
 
@@ -708,54 +762,10 @@ Saida esperada durante a execução do script:
 
 O sistema de Skills do Hermes usa carregamento progressivo de contexto: as instruções especializadas podem ser disponibilizadas quando necessárias, em vez de manter todo o conteúdo carregado o tempo inteiro.
 
-## 8. Definir regras de operação e segurança
-
-O `SOUL.md` deve definir a identidade e o comportamento. As instruções operacionais devem definir como o trabalho é executado.
-
-Recomendo que o agente tenha regras explícitas para os seguintes pontos:
-
-- Objetivo: qual resultado precisa entregar.
-- Escopo: quais tarefas pode e não pode executar.
-- Método de trabalho: sequência padrão de análise e execução.
-- Fontes: quais fontes são preferenciais e como resolver divergências.
-- Validação: como conferir resultados antes de entregá-los.
-- Formato de saída: estrutura, nível de detalhe, tabelas, referências e arquivos.
-- Incerteza: quando declarar que não há evidência suficiente.
-- Escalonamento: quando deve perguntar ao usuário ou solicitar revisão de outro agente.
-
-Um exemplo de procedimento geral seria:
-
-```
-1. Interpretar o objetivo e identificar as restrições.
-2. Verificar se existem informações suficientes.
-3. Selecionar as ferramentas e Skills necessárias.
-4. Executar a tarefa por etapas.
-5. Validar os resultados e suas fontes.
-6. Conferir se todos os requisitos foram atendidos.
-7. Entregar o resultado e declarar limitações relevantes.
-```
-
-Esse fluxo deve ser adaptado à função do profile, e não repetido cegamente em todas as tarefas.
-
-Importante: não confunda instruções de identidade com instruções de execução. Se você colocar regras detalhadas demais no `SOUL.md`, pode acabar misturando personalidade, procedimentos e políticas de segurança em um único arquivo difícil de manter.
-
-### 4-1. Estabelecer regras de segurança e autonomia
-
-Antes de permitir que o agente modifique arquivos, execute comandos ou opere sistemas externos, defina os limites da sua autonomia.
-
-A documentação do Hermes descreve mecanismos de proteção como autorização de usuários, aprovação de comandos perigosos, controles de escrita, isolamento de execução e filtragem de credenciais.
-Sugiro três níveis operacionais:
-![nextstep](./img/nextstep2.png)
-
-Para começar, recomendo o nível 1 ou 2. Só aumente a autonomia depois de comprovar que o agente respeita as restrições.
-
-Não considere uma instrução no prompt suficiente para proteger credenciais, dados ou infraestrutura. Use também os controles técnicos de permissões e isolamento disponíveis.
-
-## 9. Integrar sistemas e agentes: MCP, APIs e plugins
+## 8. Integrar sistemas e agentes: MCP, APIs e plugins
 [Catalogo de Plugins - Hermes - Oficial](https://hermes-agent.nousresearch.com/docs/plugins)
 
 Essa etapa só é necessária quando o agente precisa acessar recursos além das ferramentas já disponíveis.
-
 O MCP (Model Context Protocol) permite conectar o Hermes a servidores que expõem ferramentas externas. É útil para integrar sistemas sem precisar implementar cada integração como uma ferramenta nativa.
 
 Exemplos de integração:
@@ -777,7 +787,7 @@ Exemplos de integração:
 
 Exemplo ilustrativo de configuração MCP:
 
-```
+```yaml
 mcp_servers:
   github:
     command: "npx"
@@ -793,6 +803,45 @@ mcp_servers:
 ```
 
 Esse exemplo ilustra a estrutura e a seleção de ferramentas, não uma configuração pronta para copiar sem verificar a compatibilidade com a versão instalada e o mecanismo de gerenciamento de credenciais. Nunca coloque tokens reais em arquivos compartilhados ou no `SOUL.md`.
+
+## 9. Definir regras de operação e segurança
+
+O `SOUL.md` deve definir a identidade e o comportamento. As instruções operacionais devem definir como o trabalho é executado.
+
+Recomendo que o agente tenha regras explícitas para os seguintes pontos:
+
+- Objetivo: qual resultado precisa entregar.
+- Escopo: quais tarefas pode e não pode executar.
+- Método de trabalho: sequência padrão de análise e execução.
+- Fontes: quais fontes são preferenciais e como resolver divergências.
+- Validação: como conferir resultados antes de entregá-los.
+- Formato de saída: estrutura, nível de detalhe, tabelas, referências e arquivos.
+- Incerteza: quando declarar que não há evidência suficiente.
+- Escalonamento: quando deve perguntar ao usuário ou solicitar revisão de outro agente.
+
+*Um exemplo de procedimento geral seria:*
+: 1. Interpretar o objetivo e identificar as restrições.
+  2. Verificar se existem informações suficientes.
+  3. Selecionar as ferramentas e Skills necessárias.
+  4. Executar a tarefa por etapas.
+  5. Validar os resultados e suas fontes.
+  6. Conferir se todos os requisitos foram atendidos.
+  7. Entregar o resultado e declarar limitações relevantes.
+
+
+Esse fluxo deve ser adaptado à função do profile, e não repetido cegamente em todas as tarefas.
+
+Importante: não confunda instruções de identidade com instruções de execução. Se você colocar regras detalhadas demais no `SOUL.md`, pode acabar misturando personalidade, procedimentos e políticas de segurança em um único arquivo difícil de manter.
+
+### 9-1. Estabelecer regras de segurança e autonomia
+
+Antes de permitir que o agente modifique arquivos, execute comandos ou opere sistemas externos, defina os limites da sua autonomia.
+A documentação do Hermes descreve mecanismos de proteção como autorização de usuários, aprovação de comandos perigosos, controles de escrita, isolamento de execução e filtragem de credenciais.
+Sugiro três níveis operacionais:
+![nextstep](./img/nextstep2.png)
+
+Para começar, recomendo o nível 1 ou 2. Só aumente a autonomia depois de comprovar que o agente respeita as restrições.
+Não considere uma instrução no prompt suficiente para proteger credenciais, dados ou infraestrutura. Use também os controles técnicos de permissões e isolamento disponíveis.
 
 ## 10. Testar, avaliar e monitorar
 
@@ -866,30 +915,10 @@ Para esse modelo funcionar, cada agente precisa ter:
 
 Não presuma que criar três profiles automaticamente estabelece um pipeline. A orquestração precisa ser implementada e testada pelo mecanismo de delegação ou integração escolhido.
 
----
 
-### Checklist final de operacionalização
 
-Use esta lista para acompanhar o desenvolvimento do seu profile.
+## 12. Referencias das Variáveis de Ambiente do Hermes
 
-#### Progresso de implementação
-Configuração
-[ ] Model e provider validados
-[ ] describe e SOUL.md revisados
-[ ] Ferramentas necessárias habilitadas
+O Hermes lê variáveis ​​de ambiente a partir do ambiente do processo e, no caso de segredos gerenciados pelo usuário, a partir de `~/.hermes/.env`. Mantenha chaves de API, tokens de bot, segredos OAuth e outras credenciais em `~/.hermes/.env`; para definições de comportamento que não envolvam segredos, prefira utilizar `config.yaml` sempre que uma chave de configuração correspondente estiver disponível. Algumas das variáveis ​​listadas abaixo servem apenas para sobrescrever valores no nível do processo ou funcionam como variáveis ​​internas de integração; portanto, não devem ser incluídas no controle de versão (commit), mesmo que estejam documentadas aqui.
 
-Conhecimento
-[ ] Memória configurada e testada
-[ ] Skills essenciais criadas e validadas
-[ ] Instruções operacionais definidas
-
-Segurança e integração
-[ ] Permissões e autonomia definidas
-[ ] MCPs e APIs testados, quando necessários
-[ ] Credenciais protegidas
-
-Produção
-[ ] Bateria de testes aprovada
-[ ] Consumo de contexto e custo avaliados
-[ ] Logs, backup e monitoramento planejados
-[ ] Rotinas e delegação validadas, quando necessárias
+[Environment Variables Reference](https://github.com/NousResearch/hermes-agent/blob/main/website/docs/reference/environment-variables.md)
