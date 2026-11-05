@@ -1,7 +1,17 @@
 # Configuração do Google Cloud Platform
 
 ## Conteúdo
+
 <!-- toc -->
+
+- [API Vs MCP](#api-vs-mcp)
+  * [Visão geral da API Google Drive](#visao-geral-da-api-google-drive)
+  * [Visão geral do MCP Google Drive](#visao-geral-do-mcp-google-drive)
+- [Step 1 — Criando Projeto no Google Cloude](#step-1--criando-projeto-no-google-cloude)
+- [Step 2 — Conectar o Drive ao Hermes](#step-2--conectar-o-drive-ao-hermes)
+- [Step 3 — Adicionar outros serviços](#step-3--adicionar-outros-servicos)
+  * [Se aparecer um erro](#se-aparecer-um-erro)
+- [Tendo acesso pelo Composio](#tendo-acesso-pelo-composio)
 
 <!-- tocstop -->
 
@@ -211,5 +221,3 @@ ___
 ## Tendo acesso pelo Composio
 
 https://composio.dev/toolkits/googledrive/framework/hermes-agent
-
-

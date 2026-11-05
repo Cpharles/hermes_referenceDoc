@@ -4,15 +4,18 @@
 
 <!-- toc -->
 
-- [Entendendo a diferença entre "Identidade" e "Descrição"](#entendendo-a-diferenca-entre-identidade-e-descricao)
+- [1. Introdução ao Tipos de Contextos](#1-introducao-ao-tipos-de-contextos)
+- [2. Entendendo a diferença entre "Identidade" e "Descrição"](#2-entendendo-a-diferenca-entre-identidade-e-descricao)
   * [1. Identidade (SOUL.md) — quem o agente *é***](#1-identidade-soulmd--quem-o-agente-e)
+    + [Atualizando - Identidade](#atualizando---identidade)
   * [2. Descrição (profile.yaml) — o que o agente *faz***](#2-descricao-profileyaml--o-que-o-agente-faz)
-- [Atualizando - Identidade](#atualizando---identidade)
-- [Atualizando - Descrição](#atualizando---descricao)
+    + [Atualizando - Descrição](#atualizando---descricao)
 
 <!-- tocstop -->
 
-Hermes tem diferentes tipos de **Contexto** que pode ser fornecido ao agente é importante entendermos onde e quando usar. 
+## 1. Introdução ao Tipos de Contextos
+
+Hermes tem diferentes tipos de **Contexto** que pode ser fornecido ao agente e é importante entendermos onde e quando usar. 
 
 > [!TIP]
 > :brain: [Arquivo de Contexto Suportado](https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files#supported-context-files)
@@ -21,15 +24,15 @@ Entre os arquivos de Contexto Suportado, temos:
 
 | Tipo de Arquivo | Proposta | Fornecido |
 |---|---|---|
-| hermes.md / HERMES.md | Instruções do projeto (prioridade máxima) | Caminhadas até git root |
-| AGENTS.override.md | Sobreposição pessoal, por diretório, do AGENTS.md (normalmente gitignorada) | CWD na startup + subdiretórios progressivamente |
-| AGENTS.md | Instruções do projeto, convenções, arquitetura | CWD na startup + subdiretórios progressivamente |
-| CLAUDE.md | Arquivos de contexto Claude Code (também detectados) | CWD na startup + subdiretórios progressivamente |
-| SOUL.md | Personalização global de personalidade e timbre para esta instância da Hermes | HERMES_HOME/SOUL.md só |
-| .cursorrules | Convenções de codificação do IDE com cursor | Apenas CWD |
-| .cursor/rules/*.mdc | Módulos de regras do cursor IDE | Apenas CWD |
+| `hermes.md / HERMES.md` | Instruções do projeto (prioridade máxima) | Caminhadas até git root |
+| `AGENTS.override.md` | Sobreposição pessoal, por diretório, do AGENTS.md (normalmente gitignorada) | CWD na startup + subdiretórios progressivamente |
+| `AGENTS.md` | Instruções do projeto, convenções, arquitetura | CWD na startup + subdiretórios progressivamente |
+| `CLAUDE.md` | Arquivos de contexto Claude Code (também detectados) | CWD na startup + subdiretórios progressivamente |
+| `SOUL.md` | Personalização global de personalidade e timbre para esta instância da Hermes | HERMES_HOME/SOUL.md só |
+| `.cursorrules` | Convenções de codificação do IDE com cursor | Apenas CWD |
+| `.cursor/rules/*.mdc` | Módulos de regras do cursor IDE | Apenas CWD |
 
-## Entendendo a diferença entre "Identidade" e "Descrição"
+## 2. Entendendo a diferença entre "Identidade" e "Descrição"
 
 Quando criamos os profiles o proprio Hermes já se encarrega de criar tanto a **Identidade** (Personalidade/Identidade) como a **Descrição** para o novo Agente (Profile). No caso da identidade, basicamente ele copía do profile **default** que é uma identidade genérica. Já para a descrição o Hermes presume a partir da analise do nome, mas nem sempre é realmente o que queremos. Portanto a melhor forma de termos controle sobre como o agente vai trabalhar é dando uma boa identidade e descrição de sua função, quase como a descrição de cargos e funções dentro de uma empresa.
 
@@ -49,6 +52,10 @@ AGENTS.md é o principal arquivo de contexto do projeto. Ele informa ao agente c
 - Só é vista pelo **modelo de linguagem** — nem o orquestrador nem outros agentes a leem;
 - Formato: arquivo markdown livre (`~/.hermes/profiles/<profile_name>/SOUL.md`), sem limite prático de extensão;
 - Impacta diretamente a **qualidade da execução** das tarefas.
+
+#### Atualizando - Identidade
+
+* Podemos atualizar via **Dashboard** ou editando o arquivo diretamente com um editor de texto. Como já comentamos, neste caso temos que alterar o arquivo `SOUL.md` direto na pasta do profile ou através do painel de controle do Hermes
 
 ### 2. Descrição (profile.yaml) — o que o agente *faz***
 
@@ -76,11 +83,7 @@ AGENTS.md é o principal arquivo de contexto do projeto. Ele informa ao agente c
 **Consequência prática:**
 As duas devem ser consistentes — a descrição promete uma especialidade (ex.: "otimiza campanhas focando em ROI e CPA") que a identidade precisa saber cumprir. Uma descrição inflada com competências ausentes no SOUL.md gera roteamento correto mas execução ruim; o inverso, um ótimo agente subutilizado porque o orquestrador não sabe delegar a ele.
 
-## Atualizando - Identidade
-
-* Podemos atualizar via **Dashboard** ou editando o arquivo diretamente com um editor de texto.
-
-## Atualizando - Descrição
+#### Atualizando - Descrição
 
 * Podemos atualizar via **CLI** - (terminal) ou editando o arquivo diretamente com um editor de texto.
 

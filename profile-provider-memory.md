@@ -3,7 +3,48 @@
 > Guia didático e prático baseado nos projetos [Mnemosyne](https://github.com/mnemosyne-oss/mnemosyne) e [Hindsight](https://github.com/vectorize-io/hindsight), e na documentação atual de integração com Hermes. Consultado em 25/10/2026.
 
 ## Conteúdo
+
 <!-- toc -->
+
+- [Para quem é este guia](#para-quem-e-este-guia)
+- [1. A ideia básica](#1-a-ideia-basica)
+- [2. O ciclo de memória](#2-o-ciclo-de-memoria)
+  * [Tipos de informação](#tipos-de-informacao)
+- [3. Como comparar as opções](#3-como-comparar-as-opcoes)
+  * [Mnemosyne](#mnemosyne)
+  * [Hindsight](#hindsight)
+  * [Gráfico qualitativo para orientar a escolha](#grafico-qualitativo-para-orientar-a-escolha)
+- [4. Uma conversa do Hermes com memória](#4-uma-conversa-do-hermes-com-memoria)
+- [5. Aplicação prática: Mnemosyne](#5-aplicacao-pratica-mnemosyne)
+  * [- Documentação de consulta](#--documentacao-de-consulta)
+  * [- Introdução](#--introducao)
+  * [Passo 1 — Confirmar o ambiente](#passo-1--confirmar-o-ambiente)
+  * [Passo 2 — Escolher o perfil de recursos para o Mnemosyne](#passo-2--escolher-o-perfil-de-recursos-para-o-mnemosyne)
+  * [Passo 3 - Criar o ambiente venv independente](#passo-3---criar-o-ambiente-venv-independente)
+  * [Passo 4 — Instalar e registrar o Mnemosyne como provider](#passo-4--instalar-e-registrar-o-mnemosyne-como-provider)
+  * [Passo 5 — Verificação e validação](#passo-5--verificacao-e-validacao)
+  * [Passo 6 — Adicionando outros profiles para usar o Mnemosyne](#passo-6--adicionando-outros-profiles-para-usar-o-mnemosyne)
+  * [Passo 7 — Configuração das variáveis do Memory Provider](#passo-7--configuracao-das-variaveis-do-memory-provider)
+    + [🔴 Deve ser alterado (afeta diretamente a correção funcional)](#%F0%9F%94%B4-deve-ser-alterado-afeta-diretamente-a-correcao-funcional)
+    + [🟢 Manter (os valores padrão já são razoáveis)](#%F0%9F%9F%A2-manter-os-valores-padrao-ja-sao-razoaveis)
+    + [🟡 Ajustável conforme preferência (não afeta correção, apenas experiência)](#%F0%9F%9F%A1-ajustavel-conforme-preferencia-nao-afeta-correcao-apenas-experiencia)
+    + [⚪ Não recomendado alterar (a menos que tenha necessidades específicas)](#%E2%9A%AA-nao-recomendado-alterar-a-menos-que-tenha-necessidades-especificas)
+    + [Resumo dos pontos de atenção:](#resumo-dos-pontos-de-atencao)
+  * [Passo 8 — Testar com dados não sensíveis](#passo-8--testar-com-dados-nao-sensiveis)
+  * [Passo 9 — Operar com segurança](#passo-9--operar-com-seguranca)
+- [6. Aplicação prática: Hindsight](#6-aplicacao-pratica-hindsight)
+  * [Passo 1 — instalar o plugin do catálogo](#passo-1--instalar-o-plugin-do-catalogo)
+  * [Passo 2 — executar o assistente de configuração](#passo-2--executar-o-assistente-de-configuracao)
+  * [Passo 3 — completar credenciais ou endpoint](#passo-3--completar-credenciais-ou-endpoint)
+  * [Passo 4 — revisar comportamento e banco](#passo-4--revisar-comportamento-e-banco)
+  * [Passo 5 — validar](#passo-5--validar)
+  * [Passo 6 — decidir o que fazer com a memória nativa do Hermes](#passo-6--decidir-o-que-fazer-com-a-memoria-nativa-do-hermes)
+- [7. Como escrever boas memórias](#7-como-escrever-boas-memorias)
+- [8. Avaliar se a memória está ajudando](#8-avaliar-se-a-memoria-esta-ajudando)
+- [9. Árvore de decisão rápida](#9-arvore-de-decisao-rapida)
+- [10. Plano de aprendizagem passo a passo](#10-plano-de-aprendizagem-passo-a-passo)
+- [11. Limites e boas práticas](#11-limites-e-boas-praticas)
+- [12. Fontes consultadas](#12-fontes-consultadas)
 
 <!-- tocstop -->
 
@@ -515,9 +556,6 @@ Não considere o primeiro teste como prova suficiente. Faça perguntas diretas e
 
 ---
 ---
-
-
-
 
 ## 6. Aplicação prática: Hindsight
 
