@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: hermes-gh.Dockerfile
-      container_name: hermes
     # image: nousresearch/hermes-agent:v0.23.1
     restart: unless-stopped
     command: gateway run
