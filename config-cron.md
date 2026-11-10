@@ -60,7 +60,7 @@ graph LR
 Temos vários caminhos para iniciar ou preparar um cron, seja para um agente ou simplesmente uma automação de uma tarefa agendada que será executada por um script.
 
 <div align="left">
-  <img width="800" title="cron1" src="./img/cron1.png" style="margin-right: 50px;"/>
+  <img width="800" title="cron1" src="./img/cron1.png"/>
 </div><br>
 
 - Podemos iniciar um Cron diretamente em um chat usando o comando `/cron`. Este chate pode ser no painel de controle, Dashboard, Telegram,...

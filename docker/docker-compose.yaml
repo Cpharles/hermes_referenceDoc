@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: hermes-gh.Dockerfile
+      container_name: hermes
     # image: nousresearch/hermes-agent:v0.22.7
     restart: unless-stopped
     command: gateway run
@@ -23,7 +24,8 @@ services:
       - HERMES_TIMEZONE=America/Sao_Paulo   # fuso horário para o Hermes
     volumes:
       - hermes_data:/opt/data
-      - /mnt/vbox_global:/shared_data # compartilhamento da pasta global (somente para aplicação homelab local)
+      - /mnt/vbox_global:/opt/data/workspace/rodentiavet # compartilhamento da pasta da VM com o container (somente para aplicação homelab local)
+
     deploy:
       resources:
         limits:

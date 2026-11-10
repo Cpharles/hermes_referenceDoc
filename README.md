@@ -14,15 +14,15 @@ Para ficarmos na mesma página vou fazer uma descrição objetiva do meu ponto d
 | O que Configurar | Documento |
 |---|---|
 | 0. Check List de instalação: | [checklist-template.md](checklist-template.md) |
-| 1. Usando o Hermes Desktop p/ acessar Servidor: | [acesso-desktop-vps.md](acesso-desktop-vps.md) |
+| 1. Usando o Hermes Desktop p/ acessar Servidor: | [config-acesso-desktop-vps.md](config-acesso-desktop-vps.md) |
 | 2. Criando multi Profiles no Hermes: | [config_multi-profile.md](config_multi-profile.md) |
 | 3. Configurando a Identidade e a Descrição dos Profiles: | [profile_identity_describe.md](profile_identity_describe.md) |
 | 4. Criando a estrutura de Bots no Telegram: | [config-telegram.md](config-telegram.md) |
 | 5. Otimizando e subindo o nível do agente: | [profile-optimizing.md](profile-optimizing.md) |
 | 6. Configurando memória persistente: | [profile-provider-memory.md](profile-provider-memory.md) |
 | 7. Configurando Google Drive: | [config_google-cloude.md](config_google-cloude.md) |
-| 8. Trabalhando com Tarefas Agendadas - Cron | [profile-cron.md](profile-cron.md) |
-| 9. Orquestração de Agentes - Kanban | |
+| 8. Trabalhando com Tarefas Agendadas - Cron | [config-cron.md](config-cron.md) |
+| 9. Orquestração de Agentes - Kanban | [config-kanban.md](config-kanban.md) |
 | 10. Fazendo Backup e Migrando para outra Máquina | [profile-migrate-all.md](profile-migrate-all.md) |
 | 11. Problemas comum com a memoria | [troubleshooting-memory.md](troubleshooting-memory.md) |
 | 12. Problemas comum na comunicação com o Telegram | [Troubleshooting-telegram.md](Troubleshooting-telegram.md) |
