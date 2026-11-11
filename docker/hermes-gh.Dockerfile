@@ -16,4 +16,8 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends gh && \
     rm -rf /var/lib/apt/lists/*
 
+# Instalar pnpm (permitindo que os scripts de instalação sejam executados, contornando o bloqueio padrão do npm 12)
+# provisório para o pnpm funcionar no container (na versão v0.23.1 do Hermes, o pnpm não está no PATH por padrão)
+RUN npm install -g --allow-scripts=pnpm pnpm
+
 USER root

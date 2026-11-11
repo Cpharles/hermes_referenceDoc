@@ -20,7 +20,7 @@ services:
       - API_SERVER_KEY=${API_SERVER_KEY}
       - GH_TOKEN=${GH_TOKEN}   # para usar no GitHub CLI
       - TZ=America/Sao_Paulo   # fuso horário do container
-      - HERMES_TIMEZONE=America/Sao_Paulo   # fuso horário para o Hermes
+      - HERMES_TIMEZONE=America/Sao_Paulo   # fuso horário para o Hermesnpm:/opt/hermes/bin:/opt/hermes/.venv/bin:/opt/data/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin # provisório para o pnpm funcionar no container (nesta versão do Hermes, o pnpm não está no PATH por padrão)
     volumes:
       - hermes_data:/opt/data
       - /mnt/vbox_global:/opt/data/workspace/rodentiavet # compartilhamento da pasta da VM com o container (somente para aplicação homelab local)
